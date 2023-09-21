@@ -23,6 +23,8 @@ one jump movement
 
 20/09/2023 -
 - start to code character with pymunk to move around 
+
+
 21/09/2023 -
 - created a demo level with art I made. The movement is now working well for the character.
 - Start to animate the character and have an accurate hit box. 
