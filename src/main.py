@@ -60,7 +60,8 @@ class App:
             if event.type == pg.KEYDOWN:
                 self.player.handle_keydown(event)
                 if event.key == pg.K_ESCAPE:
-                    pg.display.toggle_fullscreen()
+                    pg.quit()
+                    sys.exit(1)
             if event.type == pg.KEYUP:
                 self.player.handle_keyup(event)
 
@@ -82,36 +83,74 @@ class App:
 
     def player_collide_wall(self):
         collisions = []
+        velocity_x = self.player.body.velocity.x
+        velocity_y = self.player.body.velocity.y
         for wall in self.walls:
             normal = self.player.poly.shapes_collide(wall.poly).normal
             collisions.append((round(normal.x), round(normal.y)))
 
-        for wall in self.walls:
-            if (0, 1) in collisions:
-                self.player.can_jump = True
-                self.space.gravity = 0, 0
-                if not self.player.right and not self.player.left:
+        if (0, 1) in collisions:  # Touching ground
+            self.player.can_jump = True
+            self.space.gravity = 0, 0
+            if not pg.key.get_pressed()[pg.K_d] and not pg.key.get_pressed()[pg.K_a]:
+                self.player.previous_animation = self.player.current_animation
+                if 'left' in self.player.previous_animation:
+                    self.player.current_animation = 'idle_left'
+                else:
                     self.player.current_animation = 'idle'
+        else:
+            self.space.gravity = 0, 1800
+        if (-1, 0) in collisions:  # Touching left wall
+            self.player.left = False
+            if (0, 1) not in collisions and velocity_y > 0:
+                self.player.previous_animation = self.player.current_animation
+                self.player.current_animation = 'wall_jump_left'
+            if velocity_y > 80:
+                self.player.body.velocity = (velocity_x, 80)
+        elif pg.key.get_pressed()[pg.K_a]:
+            self.player.left = True
+            if (0, 1) not in collisions:
+                self.player.previous_animation = self.player.current_animation
+                if velocity_y > 40:
+                    self.player.current_animation = 'fall_left'
+                else:
+                    self.player.current_animation = 'jump_left'
             else:
-                self.space.gravity = 0, 1800
-                self.player.current_animation = 'jump'
-            if (-1, 0) in collisions:  # Can't press left on a left wall
-                self.player.left = False
-                if (0, 1) not in collisions and self.player.body.velocity.y > 0:
-                    self.player.current_animation = 'wall_jump'
-                if self.player.body.velocity.y > 80:
-                    self.player.body.velocity = (self.player.body.velocity.x, 80)
-            elif pg.key.get_pressed()[pg.K_a]:
-                self.player.left = True
+                self.player.previous_animation = self.player.current_animation
+                self.player.current_animation = 'run_left'
 
-            if (1, 0) in collisions:
-                self.player.right = False
-                if (0, 1) not in collisions and self.player.body.velocity.y > 0:
-                    self.player.current_animation = 'wall_jump'
-                if self.player.body.velocity.y > 80:
-                    self.player.body.velocity = (self.player.body.velocity.x, 80)
-            elif pg.key.get_pressed()[pg.K_d]:
-                self.player.right = True
+        if (1, 0) in collisions:  # Touching right wall
+            self.player.right = False
+            if (0, 1) not in collisions and velocity_y > 0:
+                self.player.previous_animation = self.player.current_animation
+                self.player.current_animation = 'wall_jump'
+            if velocity_y > 80:
+                self.player.body.velocity = (velocity_x, 80)
+        elif pg.key.get_pressed()[pg.K_d]:
+            self.player.right = True
+            if (0, 1) not in collisions:
+                self.player.previous_animation = self.player.current_animation
+                if velocity_y > 40:
+                    self.player.current_animation = 'fall'
+                else:
+                    self.player.current_animation = 'jump'
+            else:
+                self.player.previous_animation = self.player.current_animation
+                self.player.current_animation = 'run'
+
+        if (1, 0) not in collisions and (-1, 0) not in collisions and (0, 1) not in collisions and -velocity_y > 1:
+            self.player.previous_animation = self.player.current_animation
+            if 'left' in self.player.previous_animation:
+                if velocity_y > 40:
+                    self.player.current_animation = 'fall_left'
+                else:
+                    self.player.current_animation = 'jump_left'
+            else:
+                if velocity_y > 40:
+                    self.player.current_animation = 'fall'
+                else:
+                    self.player.current_animation = 'jump'
+
 
 
 if __name__ == '__main__':
