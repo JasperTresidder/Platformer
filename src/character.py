@@ -1,12 +1,12 @@
 from settings import *
 
 class Character(pg.sprite.Sprite):
-    def __init__(self, space: pm.space.Space, screen: pg.Surface):
+    def __init__(self, space: pm.space.Space, screen: pg.Surface, wall_jump):
         self.space = space
         self.screen = screen
         self.current_animation = 'idle'
         self.previous_animation = 'idle'
-        self.wall_jump = WALL_JUMP
+        self.wall_jump = wall_jump
         super().__init__()
         self.body = pm.Body()  # Create a Body
         self.body.position = SCREEN_SIZE[0] / 50, 4*SCREEN_SIZE[1]/10  # Set the position of the body

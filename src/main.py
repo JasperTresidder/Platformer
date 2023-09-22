@@ -11,9 +11,6 @@ from spike import Spike
 from flag import Flag
 from item import Item
 
-LEVEL_IMAGE = pg.image.load('../data/tiled/level' + str(LEVEL) + '.png').convert_alpha()
-LEVEL_IMAGE = pg.transform.scale(LEVEL_IMAGE, SCREEN_SIZE)
-
 BACKGROUNDS = [
     pg.image.load('../data/raw/Jungle Asset Pack/Jungle Asset Pack/parallax background/' + filename).convert()
     for filename in os.listdir('../data/raw/Jungle Asset Pack/Jungle Asset Pack/parallax background/') if
@@ -27,7 +24,9 @@ for image in BACKGROUNDS:
 one_pix = SCREEN_SIZE[0] / 15
 
 
-def load_level(filename: str, filename2: str):
+def load_level(level_number: int):
+
+    filename1, filename2 = '../data/tiled/level' + str(level_number) + '_Tile Layer 1.csv', '../data/tiled/level' + str(level_number) + '_Tile Layer 2.csv'
     level = []
     level_box = []
     item = None
@@ -37,10 +36,12 @@ def load_level(filename: str, filename2: str):
     level.append(Wall(SPACE, (100, 2000), (-100, -100), True))
     level.append(Wall(SPACE, (100, 2000), (SCREEN_SIZE[0], -100), True))
     level.append(Wall(SPACE, (2000, 100), (-100, SCREEN_SIZE[1]), True))
-    data = open(filename)
+    data = open(filename1)
     array = np.loadtxt(data, delimiter=",")
     data = open(filename2)
     array2 = np.loadtxt(data, delimiter=",")
+    LEVEL_IMAGE = pg.image.load('../data/tiled/level' + str(level_number) + '.png').convert_alpha()
+    LEVEL_IMAGE = pg.transform.scale(LEVEL_IMAGE, SCREEN_SIZE)
     for j, row in enumerate(array):
         for i, point in enumerate(row):
             if point not in [-1, 0]:
@@ -67,11 +68,10 @@ def load_level(filename: str, filename2: str):
                     Spike(SPACE, (SCREEN_SIZE[0] / screen_tiles[0], SCREEN_SIZE[1] / (3 * screen_tiles[1])),
                          (i * SCREEN_SIZE[0] / screen_tiles[0] + 0.06, (j * SCREEN_SIZE[1] / screen_tiles[1]) + (
                                      2 * SCREEN_SIZE[1] / (3 * screen_tiles[1])) + 0.06)))
-    return level, level_box, level_spikes, level_flag, FLAG_LOCATION_1, FLAG_LOCATION_2, item
+    return level, level_box, level_spikes, level_flag, FLAG_LOCATION_1, FLAG_LOCATION_2, item, LEVEL_IMAGE
 
 
-Walls, Boxes, Spikes, Flag_, FLAG_LOCATION_1, FLAG_LOCATION_2, item = load_level(
-    '../data/tiled/level' + str(LEVEL) + '_Tile Layer 1.csv', '../data/tiled/level' + str(LEVEL) + '_Tile Layer 2.csv')
+
 
 
 class App:
@@ -82,20 +82,16 @@ class App:
         self.space.gravity = 0, 1800*SCREEN_SIZE[1]/1080
         self.game_clock = pg.time.Clock()
         self.running = True
-        self.player = Character(self.space, self.screen)
+        self.player = Character(self.space, self.screen, WALL_JUMP)
+        self.level = 1
 
         screen_dim = (150, 85)
         self.game_tick = 0
         self.time_hit_flag = 0
-
-        self.walls = Walls
-        self.push_objects = Boxes
-        self.spikes = Spikes
-        self.flag = Flag_
-        self.flag.add_to_space()
-        self.item = item
+        self.walls, self.push_objects, self.spikes, self.flag, self.flag_location_1, self.flag_location_2, self.item, self.level_image = load_level(LEVEL)
         if self.item is not None:
             self.item.add_to_space()
+        self.flag.add_to_space()
 
         for wall in self.walls:
             wall.add_to_space()
@@ -164,7 +160,7 @@ class App:
 
     def draw_background(self) -> None:
         self.screen.blit(BACKGROUND, (0, 0), BACKGROUND.get_rect())
-        self.screen.blit(LEVEL_IMAGE, (0, 0), LEVEL_IMAGE.get_rect())
+        self.screen.blit(self.level_image, (0, 0), self.level_image.get_rect())
 
     def player_collide_wall(self) -> None:
         collisions = []
@@ -191,16 +187,20 @@ class App:
         if self.player.poly.shapes_collide(self.flag.poly).points:
             if not self.flag.got and self.game_tick - self.time_hit_flag > 30:
                 self.flag.body.position = (
-                FLAG_LOCATION_2[0] + self.flag.flag_size[0] / 2, FLAG_LOCATION_2[1] + self.flag.flag_size[1] / 2)
+                self.flag_location_2[0] + self.flag.flag_size[0] / 2, self.flag_location_2[1] + self.flag.flag_size[1] / 2)
                 self.flag.got = True
                 self.time_hit_flag = self.game_tick
             elif self.game_tick - self.time_hit_flag > 30:
-                # self.next_level()
-                self.flag.body.position = (
-                    FLAG_LOCATION_1[0] + self.flag.flag_size[0] / 2, FLAG_LOCATION_1[1] + self.flag.flag_size[1] / 2)
-                self.flag.got = False
-                self.time_hit_flag = self.game_tick
-                
+                try:
+                    self.next_level()
+                except:
+                    self.level = 0
+                    self.next_level()
+                # self.flag.body.position = (
+                #     self.flag_location_1[0] + self.flag.flag_size[0] / 2, self.flag_location_1[1] + self.flag.flag_size[1] / 2)
+                # self.flag.got = False
+                # self.time_hit_flag = self.game_tick
+
     def player_collide_item(self) -> None:
         if self.player.poly.shapes_collide(self.item.poly).points:
             self.item.body.position = (SCREEN_SIZE[0] + 200, 0)
@@ -215,13 +215,43 @@ class App:
                     object.body.position = object.initial_position
                 if self.flag.got:
                     self.flag.body.position = (
-                    FLAG_LOCATION_1[0] + self.flag.flag_size[0] / 2, FLAG_LOCATION_1[1] + self.flag.flag_size[1] / 2)
+                    self.flag_location_1[0] + self.flag.flag_size[0] / 2, self.flag_location_1[1] + self.flag.flag_size[1] / 2)
                     self.flag.got = False
                 if LEVEL == 2:
                     if self.item.got:
                         self.item.body.position = self.item.initial_position
                         self.item.got = False
                         self.player.wall_jump = False
+
+    def next_level(self):
+        if self.level == MAX_LEVEL:
+            self.level = 0
+        for object in self.walls:
+            self.space.remove(object.body, object.poly)
+        for object in self.push_objects:
+            self.space.remove(object.body, object.poly)
+        for object in self.spikes:
+            self.space.remove(object.body, object.poly)
+        self.space.remove(self.flag.body, self.flag.poly)
+        self.space.remove(self.player.body, self.player.poly)
+        if self.item is not None:
+            self.space.remove(self.item.body, self.item.poly)
+
+        self.level += 1
+        self.walls, self.push_objects, self.spikes, self.flag, self.flag_location_1, self.flag_location_2, self.item, self.level_image = load_level(
+            self.level)
+        self.player = Character(self.space, self.screen, self.player.wall_jump)
+        if self.item is not None:
+            self.item.add_to_space()
+        self.flag.add_to_space()
+
+        for wall in self.walls:
+            wall.add_to_space()
+        for object in self.push_objects:
+            object.add_to_space()
+        for object in self.spikes:
+            object.add_to_space()
+
 
 
 if __name__ == '__main__':
