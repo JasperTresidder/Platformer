@@ -8,7 +8,7 @@ DEBUG = False
 #############
 
 WALL_JUMP = True
-LEVEL = 2
+LEVEL = 3
 
 
 
@@ -20,7 +20,7 @@ screen_tiles = (30, 17)
 
 SPACE = pm.Space()
 SCREEN_SIZE = (screen_s[0], screen_s[1])
-FRAMERATE = 200
+FRAMERATE = 165
 PLAYER_SPEED = 6*60/FRAMERATE
 SCREEN = pg.display.set_mode(SCREEN_SIZE, pg.FULLSCREEN, vsync=True)
 pg.mouse.set_visible(False)
@@ -34,7 +34,7 @@ pg.mouse.set_visible(False)
 # Level0_Dynamic = [Obstacle(SCREEN, SPACE, (120, 120), (SCREEN_SIZE[0]/2 -30, SCREEN_SIZE[1] / 1.5))]
 
 CHARACTERS = ['Ninja Frog', 'Mask Dude', 'Pink Man', 'Virtual Guy']
-CHARACTER = CHARACTERS[1]
+CHARACTER = CHARACTERS[3]
 
 Character_Spritesheets = {
     'idle': pg.image.load("../data/assets/Main Characters/" + CHARACTER + "/Idle (32x32).png").convert_alpha(),

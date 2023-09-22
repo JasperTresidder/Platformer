@@ -79,7 +79,7 @@ class App:
         self.screen = screen
         self.space = space
         self.curr_fps = FRAMERATE
-        self.space.gravity = 0, 1800
+        self.space.gravity = 0, 1800*SCREEN_SIZE[1]/1080
         self.game_clock = pg.time.Clock()
         self.running = True
         self.player = Character(self.space, self.screen)

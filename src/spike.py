@@ -10,7 +10,7 @@ class Spike(pg.sprite.Sprite):
         self.body.body_type = pm.Body.STATIC
         self.body.position = (location[0] + size[0]/2, location[1] + size[1]/2)  # Set the position of the body
 
-        self.poly = pm.Poly.create_box(self.body, size)  # Create a box shape and attach to body
+        self.poly = pm.Poly.create_box(self.body, (size[0] - size[1], 0), size[1]/2)  # Create a box shape and attach to body
         self.poly.color = pg.Color("pink")
         self.poly.mass = 100000 # Set the mass on the shape
         self.poly.elasticity = 0
