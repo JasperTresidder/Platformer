@@ -9,7 +9,8 @@ class Obstacle(pg.sprite.Sprite):
         self.space = space
         self.screen = screen
         self.body = pm.Body()  # Create a Body
-        self.body.position = (location[0] + size[0]/2, location[1] + size[1]/2)  # Set the position of the body
+        self.body.position = (location[0] + size[0]/2, location[1] + size[1]/2 + size[1]/8)  # Set the position of the body
+        self.initial_position = self.body.position
         self.poly = pm.Poly.create_box(self.body, (size[0], size[1] - size[0]/20), size[0]/10)  # Create a box shape and attach to body
         self.poly.color = pg.Color("blue")
         self.poly.mass = 100000 # Set the mass on the shape
@@ -17,7 +18,7 @@ class Obstacle(pg.sprite.Sprite):
         self.poly.density = 100000
         self.poly.friction = 1
         OBSTACLE = pg.image.load("../data/raw/Pixel Adventure 1/Free/Items/Boxes/Box3/Idle.png").convert_alpha()
-        self.size = 200, 170
+        self.size = 185, 150
         self.img = pg.transform.scale(OBSTACLE, self.size)
 
 

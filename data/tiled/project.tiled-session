@@ -7,6 +7,10 @@
     "expandedProjectPaths": [
     ],
     "fileStates": {
+        "All items.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
         "jungle tileset.tsx": {
             "dynamicWrapping": false,
             "scaleInDock": 1,
@@ -16,13 +20,37 @@
             "scale": 2.1236458333333332,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 201.77564134006968,
+                "x": 234.73782312257813,
                 "y": 135.1449453082847
+            }
+        },
+        "level1.tmx": {
+            "scale": 2,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 239.25,
+                "y": 131.5
+            }
+        },
+        "level2.tmx": {
+            "scale": 1.9376041666666666,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 242.82565453470244,
+                "y": 135.21853663781516
+            }
+        },
+        "level3.tmx": {
+            "scale": 1.9376041666666666,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 240.24514811031662,
+                "y": 136.2507392075695
             }
         }
     },
     "last.exportedFilePath": "B:/Jasper/Python/Platformer/data/tiled",
-    "last.imagePath": "B:/Jasper/Python/Platformer/data/raw/Pixel Adventure 1/Free/Terrain",
+    "last.imagePath": "B:/Jasper/Python/Platformer/data/raw/Sprout Lands - Sprites - premium pack/Sprout Lands - Sprites - premium pack/Items",
     "map.height": 17,
     "map.lastUsedExportFilter": "CSV files (*.csv)",
     "map.lastUsedFormat": "tmx",
@@ -32,6 +60,7 @@
     ],
     "project": "project.tiled-project",
     "recentFiles": [
+        "All items.tsx",
         "jungle tileset.tsx"
     ],
     "tileset.lastUsedFormat": "tsx",

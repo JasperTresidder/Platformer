@@ -6,9 +6,10 @@ class Character(pg.sprite.Sprite):
         self.screen = screen
         self.current_animation = 'idle'
         self.previous_animation = 'idle'
+        self.wall_jump = WALL_JUMP
         super().__init__()
         self.body = pm.Body()  # Create a Body
-        self.body.position = SCREEN_SIZE[0] / 15, 4*SCREEN_SIZE[1]/10  # Set the position of the body
+        self.body.position = SCREEN_SIZE[0] / 50, 4*SCREEN_SIZE[1]/10  # Set the position of the body
 
         self.poly = pm.Poly.create_box(self.body, ((SCREEN_SIZE[0]/screen_tiles[0]) - 16, SCREEN_SIZE[1]/screen_tiles[1] - 5), 5)
         self.poly.color = pg.Color("pink")
@@ -57,7 +58,7 @@ class Character(pg.sprite.Sprite):
             self.left = False
 
     def update_animation_wall(self, collisions):
-        wall_slide_speed = 10
+        wall_slide_speed = 5
         velocity_x = self.body.velocity.x
         velocity_y = self.body.velocity.y
 
@@ -76,7 +77,7 @@ class Character(pg.sprite.Sprite):
             if (0, 1) not in collisions and velocity_y > wall_slide_speed:
                 self.previous_animation = self.current_animation
                 self.current_animation = 'wall_jump_left'
-                if WALL_JUMP:
+                if self.wall_jump:
                     self.can_jump = True
                 else:
                     self.can_jump = False
@@ -85,6 +86,9 @@ class Character(pg.sprite.Sprite):
                 self.current_animation = 'idle'
             if velocity_y > 80:
                 self.body.velocity = (velocity_x, 80)
+            if not pg.key.get_pressed()[pg.K_a]:
+                self.body.position = [self.body.position.x + 0.1, self.body.position.y]
+                self.current_animation = 'fall'
         elif pg.key.get_pressed()[pg.K_a]:
             self.left = True
             if (0, 1) not in collisions:
@@ -102,7 +106,7 @@ class Character(pg.sprite.Sprite):
             if (0, 1) not in collisions and velocity_y > wall_slide_speed:
                 self.previous_animation = self.current_animation
                 self.current_animation = 'wall_jump'
-                if WALL_JUMP:
+                if self.wall_jump:
                     self.can_jump = True
                 else:
                     self.can_jump = False
@@ -111,6 +115,9 @@ class Character(pg.sprite.Sprite):
                 self.current_animation = 'idle'
             if velocity_y > 80:
                 self.body.velocity = (velocity_x, 80)
+            if not pg.key.get_pressed()[pg.K_d]:
+                self.body.position = [self.body.position.x - 0.1, self.body.position.y]
+                self.current_animation = 'fall'
         elif pg.key.get_pressed()[pg.K_d]:
             self.right = True
             if (0, 1) not in collisions:

@@ -1,6 +1,4 @@
-from wall import Wall
-from push_obstacle import Obstacle
-from spike import Spike
+from typing import Tuple, List
 import pymunk as pm
 import pygame as pg
 import numpy as np
@@ -9,7 +7,8 @@ import numpy as np
 DEBUG = False
 #############
 
-WALL_JUMP = False
+WALL_JUMP = True
+LEVEL = 2
 
 
 
@@ -21,37 +20,11 @@ screen_tiles = (30, 17)
 
 SPACE = pm.Space()
 SCREEN_SIZE = (screen_s[0], screen_s[1])
-FRAMERATE = 165
+FRAMERATE = 200
 PLAYER_SPEED = 6*60/FRAMERATE
 SCREEN = pg.display.set_mode(SCREEN_SIZE, pg.FULLSCREEN, vsync=True)
 pg.mouse.set_visible(False)
 
-def load_level(filename: str, filename2: str) -> tuple[list[Wall], list[Obstacle], list[Spike]]:
-    level = []
-    level_box = []
-    level_spikes = []
-    level.append(Wall(SPACE, (2000, 100), (-100, -100), True))
-    level.append(Wall(SPACE, (100, 2000), (-100, -100), True))
-    level.append(Wall(SPACE, (100, 2000), (SCREEN_SIZE[0], -100), True))
-    level.append(Wall(SPACE, (2000, 100), (-100, SCREEN_SIZE[1]), True))
-    data = open(filename)
-    array = np.loadtxt(data, delimiter=",")
-    data = open(filename2)
-    array2 = np.loadtxt(data, delimiter=",")
-    for j, row in enumerate(array):
-        for i, point in enumerate(row):
-            if point not in [-1, 0]:
-                level.append(Wall(SPACE, (SCREEN_SIZE[0] / screen_tiles[0], SCREEN_SIZE[1] / screen_tiles[1]),
-                                  (i*SCREEN_SIZE[0] / screen_tiles[0] + 0.06, j * SCREEN_SIZE[1] / screen_tiles[1] + 0.06)))
-            if array2[j][i] == 215:
-                level_box.append(Obstacle(SCREEN, SPACE, (120, 120), (i*SCREEN_SIZE[0] / screen_tiles[0] + 0.06, j * SCREEN_SIZE[1] / screen_tiles[1] + 0.06)))
-            if point == 0:
-                level_spikes.append(Wall(SPACE, (SCREEN_SIZE[0] / screen_tiles[0], SCREEN_SIZE[1] / (2*screen_tiles[1])),
-                                  (i*SCREEN_SIZE[0] / screen_tiles[0] + 0.06, (j * SCREEN_SIZE[1] / screen_tiles[1]) + (SCREEN_SIZE[1] / (2 * screen_tiles[1])) + 0.06)))
-    return level, level_box, level_spikes
-
-
-Level0, Level0_Dynamic, Level0_Spikes = load_level('../data/tiled/level1_Tile Layer 1.csv', '../data/tiled/level1_Tile Layer 2.csv')
 
 # Level0 = [Wall(SPACE, (29 / 150 * SCREEN_SIZE[0], 600), (0, 45 / 85 * SCREEN_SIZE[1])),
 #           Wall(SPACE, (2000, 900), (5 / 150 * SCREEN_SIZE[0], 69 * SCREEN_SIZE[1] / 85)),
@@ -86,3 +59,18 @@ for key, value in Character_Spritesheets.items():
     for frame in range(int(value.get_size()[0]/32)):
         animation.append(value.subsurface((frame*32, 0, 32, 32)))
     Frog_Animations[key] = animation
+
+FLAG = pg.image.load(
+            '../data/raw/Pixel Adventure 1/Free/Items/Checkpoints/Checkpoint/Checkpoint (Flag Idle)(64x64).png').convert_alpha()
+Flag_Animation = []
+for frame in range(int(FLAG.get_size()[0] / 64)):
+    Flag_Animation.append(FLAG.subsurface((frame * 64, 0, 64, 64)))
+
+ITEM = pg.image.load(
+            '../data/raw/Pixel Adventure 1/Free/Items/Fruits/Cherries.png').convert_alpha()
+
+Item_Animation = []
+for frame in range(int(ITEM.get_size()[0] / 32)):
+    Item_Animation.append(ITEM.subsurface((frame * 32, 0, 32, 32)))
+
+

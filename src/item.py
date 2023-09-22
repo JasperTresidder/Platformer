@@ -3,14 +3,15 @@ import pygame as pg
 import pymunk as pm
 
 
-class Flag(pg.sprite.Sprite):
+class Item(pg.sprite.Sprite):
     def __init__(self, screen: pg.Surface, space, size, location):
         super().__init__()
         self.space = space
         self.screen = screen
         self.body = pm.Body()  # Create a Body
-        self.body.position = (location[0] + size[0]/2, location[1] + size[1]/2)  # Set the position of the body
         self.body.body_type = pm.Body.KINEMATIC
+        self.body.position = (location[0] + size[0]/2, location[1] + size[1]/2)  # Set the position of the body
+        self.initial_position = self.body.position
         self.flag_size = size
         self.poly = pm.Poly.create_box(self.body, size)  # Create a box shape and attach to body
         self.poly.color = pg.Color("blue")
@@ -18,8 +19,8 @@ class Flag(pg.sprite.Sprite):
         self.poly.elasticity = 0
         self.poly.density = 0
         self.poly.friction = 0
-        self.imgs = Flag_Animation
-        self.size = 200, 200
+        self.imgs = Item_Animation
+        self.size = SCREEN_SIZE[0]/screen_tiles[0], SCREEN_SIZE[1]/screen_tiles[1]
         self.img = [pg.transform.scale(img, self.size) for img in self.imgs]
         self.frame = 0
         self.got = False
