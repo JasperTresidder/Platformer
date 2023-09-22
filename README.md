@@ -28,3 +28,6 @@ one jump movement
 21/09/2023 -
 - created a demo level with art I made. The movement is now working well for the character.
 - Start to animate the character and have an accurate hit box. 
+- Added dynamic push object to interact with.
+- TODO: pixels for all objects the same size. moving platform 
+- Started flag object 

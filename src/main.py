@@ -1,16 +1,27 @@
+import os
 import sys
 import pygame as pg
 import pymunk as pm
 from pymunk.pygame_util import DrawOptions
 from character import Character
+from push_obstacle import Obstacle
 from wall import Wall
 from settings import *
 
-L1 = pg.image.load('../data/map/1/level.PNG').convert_alpha()
+L1 = pg.image.load('../data/tiled/level1.png').convert_alpha()
 L1 = pg.transform.scale(L1, SCREEN_SIZE)
 
-one_pix = SCREEN_SIZE[0]/15
+BACKGROUNDS = [
+    pg.image.load('../data/raw/Jungle Asset Pack/Jungle Asset Pack/parallax background/' + filename).convert()
+    for filename in os.listdir('../data/raw/Jungle Asset Pack/Jungle Asset Pack/parallax background/') if 'png' in filename
+]
+BACKGROUNDS = [pg.transform.scale(image, SCREEN_SIZE) for image in BACKGROUNDS[0:2]]
+BACKGROUND = pg.Surface(SCREEN_SIZE)
+for image in BACKGROUNDS:
+    BACKGROUND.blit(image, (0, 0), image.get_rect())
 
+
+one_pix = SCREEN_SIZE[0] / 15
 
 
 class App:
@@ -22,13 +33,20 @@ class App:
         self.game_clock = pg.time.Clock()
         self.running = True
         self.player = Character(self.space, self.screen)
+
         screen_dim = (150, 85)
         self.game_tick = 0
 
         self.walls = Level0
+        self.push_objects = Level0_Dynamic
+        self.spikes = Level0_Spikes
 
         for wall in self.walls:
             wall.add_to_space()
+        for object in self.push_objects:
+            object.add_to_space()
+        for object in self.spikes:
+            object.add_to_space()
 
     def run(self) -> None:
         """
@@ -41,12 +59,15 @@ class App:
         while self.running:
             self.handle_game_events()
             self.draw_background()
-            # self.space.debug_draw(options)  # Print the state of the simulation
+            if DEBUG:
+                self.space.debug_draw(options)  # Print the state of the simulation
             self.player.draw(self.game_tick)
+            for object in self.push_objects:
+                object.draw()
             self.player_collide_wall()
+            self.player_collide_push_object()
             self.update()
-            self.space.step(0.02 * 60/FRAMERATE)  # Step the simulation one step forward
-
+            self.space.step(0.02 * 60 / FRAMERATE)  # Step the simulation one step forward
 
     def handle_game_events(self) -> None:
         """
@@ -65,7 +86,7 @@ class App:
             if event.type == pg.KEYUP:
                 self.player.handle_keyup(event)
 
-    def update(self):
+    def update(self) -> None:
         """
         Flip the screen and tick the clock
         :return:
@@ -77,80 +98,29 @@ class App:
         pg.display.set_caption(str(self.curr_fps))
         pg.display.flip()
 
-    def draw_background(self):
+    def draw_background(self) -> None:
+        self.screen.blit(BACKGROUND, (0, 0), BACKGROUND.get_rect())
         self.screen.blit(L1, (0, 0), L1.get_rect())
 
-
-    def player_collide_wall(self):
+    def player_collide_wall(self) -> None:
         collisions = []
-        velocity_x = self.player.body.velocity.x
-        velocity_y = self.player.body.velocity.y
         for wall in self.walls:
             normal = self.player.poly.shapes_collide(wall.poly).normal
             collisions.append((round(normal.x), round(normal.y)))
 
-        if (0, 1) in collisions:  # Touching ground
-            self.player.can_jump = True
-            self.space.gravity = 0, 0
-            if not pg.key.get_pressed()[pg.K_d] and not pg.key.get_pressed()[pg.K_a]:
-                self.player.previous_animation = self.player.current_animation
-                if 'left' in self.player.previous_animation:
-                    self.player.current_animation = 'idle_left'
-                else:
-                    self.player.current_animation = 'idle'
-        else:
-            self.space.gravity = 0, 1800
-        if (-1, 0) in collisions:  # Touching left wall
-            self.player.left = False
-            if (0, 1) not in collisions and velocity_y > 0:
-                self.player.previous_animation = self.player.current_animation
-                self.player.current_animation = 'wall_jump_left'
-            if velocity_y > 80:
-                self.player.body.velocity = (velocity_x, 80)
-        elif pg.key.get_pressed()[pg.K_a]:
-            self.player.left = True
-            if (0, 1) not in collisions:
-                self.player.previous_animation = self.player.current_animation
-                if velocity_y > 40:
-                    self.player.current_animation = 'fall_left'
-                else:
-                    self.player.current_animation = 'jump_left'
-            else:
-                self.player.previous_animation = self.player.current_animation
-                self.player.current_animation = 'run_left'
+        self.player.update_animation_wall(collisions)
 
-        if (1, 0) in collisions:  # Touching right wall
-            self.player.right = False
-            if (0, 1) not in collisions and velocity_y > 0:
-                self.player.previous_animation = self.player.current_animation
-                self.player.current_animation = 'wall_jump'
-            if velocity_y > 80:
-                self.player.body.velocity = (velocity_x, 80)
-        elif pg.key.get_pressed()[pg.K_d]:
-            self.player.right = True
-            if (0, 1) not in collisions:
-                self.player.previous_animation = self.player.current_animation
-                if velocity_y > 40:
-                    self.player.current_animation = 'fall'
-                else:
-                    self.player.current_animation = 'jump'
-            else:
-                self.player.previous_animation = self.player.current_animation
-                self.player.current_animation = 'run'
+    def player_collide_push_object(self) -> None:
+        collisions = []
+        collisions_wall = []
+        for object in self.push_objects:
+            normal = self.player.poly.shapes_collide(object.poly).normal
+            collisions.append((round(normal.x), round(normal.y)))
+        for wall in self.walls:
+            normal = self.push_objects[0].poly.shapes_collide(wall.poly).normal
+            collisions_wall.append((round(normal.x), round(normal.y)))
 
-        if (1, 0) not in collisions and (-1, 0) not in collisions and (0, 1) not in collisions and -velocity_y > 1:
-            self.player.previous_animation = self.player.current_animation
-            if 'left' in self.player.previous_animation:
-                if velocity_y > 40:
-                    self.player.current_animation = 'fall_left'
-                else:
-                    self.player.current_animation = 'jump_left'
-            else:
-                if velocity_y > 40:
-                    self.player.current_animation = 'fall'
-                else:
-                    self.player.current_animation = 'jump'
-
+        self.player.update_animation_push_object(collisions, collisions_wall, self.push_objects)
 
 
 if __name__ == '__main__':
