@@ -9,7 +9,7 @@ class Character(pg.sprite.Sprite):
         self.previous_animation = 'idle'
         self.wall_jump = wall_jump
         self.screen_adjust = 0
-        if SCREEN_SIZE[1] < 800:
+        if SCREEN_SIZE[1] < 1080:
             self.screen_adjust = 135
         super().__init__()
         self.body = pm.Body()  # Create a Body
@@ -216,9 +216,9 @@ class Character(pg.sprite.Sprite):
     def update(self):
         self.body.angle = 0
         if self.right:
-            self.body.position += (PLAYER_SPEED*SCREEN_SIZE[0]/1920 + self.screen_adjust/380, 0)
+            self.body.position += (PLAYER_SPEED*SCREEN_SIZE[0]/1920 + self.screen_adjust/230, 0)
         if self.left:
-            self.body.position += (-PLAYER_SPEED*SCREEN_SIZE[0]/1920 - self.screen_adjust/380, 0)
+            self.body.position += (-PLAYER_SPEED*SCREEN_SIZE[0]/1920 - self.screen_adjust/230, 0)
         if not self.left and not self.right:
             self.body.velocity = (0, self.body.velocity.y)
         if self.up:
