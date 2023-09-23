@@ -54,13 +54,12 @@ def load_level(level_number: int):
                                               (j - 1) * SCREEN_SIZE[1] / screen_tiles[1] + 0.06)))
             if array2[j][i] == 210:
                 FLAG_LOCATION_1 = (i * SCREEN_SIZE[0] / screen_tiles[0] + 0.06,
-                                   j * SCREEN_SIZE[1] / screen_tiles[1] - 1.2 * SCREEN_SIZE[1] / screen_tiles[1])
-                level_flag = Flag(SCREEN, SPACE, (75, 140), (i * SCREEN_SIZE[0] / screen_tiles[0] + 0.06,
-                                                             j * SCREEN_SIZE[1] / screen_tiles[1] - 1.2 * SCREEN_SIZE[
-                                                                 1] / screen_tiles[1]))
+                                                             j * SCREEN_SIZE[1] / screen_tiles[1] - SCREEN_SIZE[1] / screen_tiles[1])
+                level_flag = Flag(SCREEN, SPACE, (SCREEN_SIZE[0] / screen_tiles[0], 2*SCREEN_SIZE[1] / screen_tiles[1]), (i * SCREEN_SIZE[0] / screen_tiles[0] + 0.06,
+                                                             j * SCREEN_SIZE[1] / screen_tiles[1] - SCREEN_SIZE[1] / screen_tiles[1]))
             if array2[j][i] == 122:
                 FLAG_LOCATION_2 = (i * SCREEN_SIZE[0] / screen_tiles[0] + 0.06,
-                                   j * SCREEN_SIZE[1] / screen_tiles[1] - 1.2 * SCREEN_SIZE[1] / screen_tiles[1])
+                                                             j * SCREEN_SIZE[1] / screen_tiles[1] - SCREEN_SIZE[1] / screen_tiles[1])
             if array2[j][i] == 105:
                 item = Item(SCREEN, SPACE,
                             (SCREEN_SIZE[0] / (2 * screen_tiles[0]), SCREEN_SIZE[1] / (2 * screen_tiles[1])),
@@ -79,7 +78,7 @@ class App:
         self.screen = screen
         self.space = space
         self.curr_fps = FRAMERATE
-        self.space.gravity = 0, 1800 * SCREEN_SIZE[1] / 1080
+        self.space.gravity = 0, 1800  # * 1080/SCREEN_SIZE[1]
         self.game_clock = pg.time.Clock()
         self.running = True
         self.player = Character(self.space, self.screen, WALL_JUMP)

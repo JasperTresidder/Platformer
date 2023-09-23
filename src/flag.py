@@ -19,7 +19,7 @@ class Flag(pg.sprite.Sprite):
         self.poly.density = 0
         self.poly.friction = 0
         self.imgs = Flag_Animation
-        self.size = 200, 200
+        self.size = (size[0]*2, size[1])
         self.img = [pg.transform.scale(img, self.size) for img in self.imgs]
         self.frame = 0
         self.got = False
@@ -33,4 +33,4 @@ class Flag(pg.sprite.Sprite):
         if self.frame >= len(self.imgs):
             self.frame = 0
         self.body.angle = 0
-        self.screen.blit(self.img[self.frame], (self.body.position.x - self.size[0]/2, self.body.position.y - self.size[1]/2 - self.size[1]/7), self.img[self.frame].get_rect())
+        self.screen.blit(self.img[self.frame], (self.body.position.x - self.size[0]/2, self.body.position.y - self.size[1]/2), self.img[self.frame].get_rect())

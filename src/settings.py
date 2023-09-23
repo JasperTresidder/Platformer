@@ -17,25 +17,27 @@ MAX_LEVEL = 4
 
 def resource_path(relative_path):
     """ Get absolute path to resource, works for dev and for PyInstaller """
-    # try:
-    #     # PyInstaller creates a temp folder and stores path in _MEIPASS
-    #     base_path = sys._MEIPASS
-    # except Exception:
-    base_path = os.path.abspath(".")
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
 
-    return relative_path
+    return os.path.join(base_path, relative_path)
 
 
 
 pg.init()
 pg.display.init()
-
-screen_s = (1920, 1080)
+if pg.display.get_desktop_sizes()[0][1] < 800:
+    screen_s = (1280, 720)
+else:
+    screen_s = (1920, 1080)
 screen_tiles = (30, 17)
 
 SPACE = pm.Space()
 SCREEN_SIZE = (screen_s[0], screen_s[1])
-FRAMERATE = 120
+FRAMERATE = 165
 PLAYER_SPEED = 6*60/FRAMERATE
 SCREEN = pg.display.set_mode(SCREEN_SIZE, vsync=True)
 pg.mouse.set_visible(False)

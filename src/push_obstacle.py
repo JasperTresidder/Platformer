@@ -20,6 +20,7 @@ class Obstacle(pg.sprite.Sprite):
         self.poly.friction = 1
         OBSTACLE = pg.image.load(resource_path("data/raw/Pixel Adventure 1/Free/Items/Boxes/Box3/Idle.png")).convert_alpha()
         self.size = 185, 150
+        self.size = size[0]*1.7, size[1]*1.39
         self.img = pg.transform.scale(OBSTACLE, self.size)
 
 
