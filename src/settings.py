@@ -29,7 +29,7 @@ def resource_path(relative_path):
 
 pg.init()
 pg.display.init()
-if pg.display.get_desktop_sizes()[0][1] < 800:
+if pg.display.get_desktop_sizes()[0][1] < 1080:
     screen_s = (1280, 720)
 else:
     screen_s = (1920, 1080)
@@ -37,7 +37,7 @@ screen_tiles = (30, 17)
 
 SPACE = pm.Space()
 SCREEN_SIZE = (screen_s[0], screen_s[1])
-FRAMERATE = 165
+FRAMERATE = 80
 PLAYER_SPEED = 6*60/FRAMERATE
 SCREEN = pg.display.set_mode(SCREEN_SIZE, vsync=True)
 pg.mouse.set_visible(False)

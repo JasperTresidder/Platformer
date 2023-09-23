@@ -216,9 +216,9 @@ class Character(pg.sprite.Sprite):
     def update(self):
         self.body.angle = 0
         if self.right:
-            self.body.position += (PLAYER_SPEED*SCREEN_SIZE[0]/1920 + self.screen_adjust/400, 0)
+            self.body.position += (PLAYER_SPEED*SCREEN_SIZE[0]/1920 + self.screen_adjust/380, 0)
         if self.left:
-            self.body.position += (-PLAYER_SPEED*SCREEN_SIZE[0]/1920 - self.screen_adjust/400, 0)
+            self.body.position += (-PLAYER_SPEED*SCREEN_SIZE[0]/1920 - self.screen_adjust/380, 0)
         if not self.left and not self.right:
             self.body.velocity = (0, self.body.velocity.y)
         if self.up:
