@@ -1,6 +1,7 @@
-from settings import *
+from src.settings import *
 import pygame as pg
 import pymunk as pm
+import math
 
 
 class Obstacle(pg.sprite.Sprite):
@@ -17,7 +18,7 @@ class Obstacle(pg.sprite.Sprite):
         self.poly.elasticity = 0
         self.poly.density = 100000
         self.poly.friction = 1
-        OBSTACLE = pg.image.load("../data/raw/Pixel Adventure 1/Free/Items/Boxes/Box3/Idle.png").convert_alpha()
+        OBSTACLE = pg.image.load(resource_path("data/raw/Pixel Adventure 1/Free/Items/Boxes/Box3/Idle.png")).convert_alpha()
         self.size = 185, 150
         self.img = pg.transform.scale(OBSTACLE, self.size)
 
@@ -27,6 +28,14 @@ class Obstacle(pg.sprite.Sprite):
 
 
     def draw(self):
-        self.body.angle = 0
-        self.screen.blit(self.img, (self.body.position.x - self.size[0]/2, self.body.position.y - self.size[1]/2), self.img.get_rect())
+        # self.body.angle = 0
+        self.blitRotateCenter(self.screen, self.img,(self.body.position.x - self.size[0]/2, self.body.position.y - self.size[1]/2), math.degrees(-self.body.angle))
+        #self.screen.blit(self.img, (self.body.position.x - self.size[0]/2, self.body.position.y - self.size[1]/2), self.img.get_rect())
+
+    @staticmethod
+    def blitRotateCenter(surf, image, topleft, angle):
+        rotated_image = pg.transform.rotate(image, angle)
+        new_rect = rotated_image.get_rect(center=image.get_rect(topleft=topleft).center)
+
+        surf.blit(rotated_image, new_rect)
 

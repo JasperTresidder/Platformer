@@ -26,7 +26,7 @@
         },
         "level1.tmx": {
             "scale": 2,
-            "selectedLayer": 1,
+            "selectedLayer": 0,
             "viewCenter": {
                 "x": 239.25,
                 "y": 131.5
@@ -34,7 +34,7 @@
         },
         "level2.tmx": {
             "scale": 1.9376041666666666,
-            "selectedLayer": 1,
+            "selectedLayer": 0,
             "viewCenter": {
                 "x": 242.82565453470244,
                 "y": 135.21853663781516
@@ -43,6 +43,14 @@
         "level3.tmx": {
             "scale": 1.9376041666666666,
             "selectedLayer": 0,
+            "viewCenter": {
+                "x": 240.24514811031662,
+                "y": 136.2507392075695
+            }
+        },
+        "level4.tmx": {
+            "scale": 1.9376041666666666,
+            "selectedLayer": 1,
             "viewCenter": {
                 "x": 240.24514811031662,
                 "y": 136.2507392075695

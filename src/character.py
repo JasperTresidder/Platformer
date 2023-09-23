@@ -1,4 +1,5 @@
-from settings import *
+from src.settings import *
+
 
 class Character(pg.sprite.Sprite):
     def __init__(self, space: pm.space.Space, screen: pg.Surface, wall_jump):
@@ -9,9 +10,11 @@ class Character(pg.sprite.Sprite):
         self.wall_jump = wall_jump
         super().__init__()
         self.body = pm.Body()  # Create a Body
-        self.body.position = SCREEN_SIZE[0] / 50, 4*SCREEN_SIZE[1]/10  # Set the position of the body
+        self.body.position = SCREEN_SIZE[0] / 50, 4 * SCREEN_SIZE[1] / 10  # Set the position of the body
 
-        self.poly = pm.Poly.create_box(self.body, ((SCREEN_SIZE[0]/screen_tiles[0]) - 16, SCREEN_SIZE[1]/screen_tiles[1] - 5), 5)
+        self.poly = pm.Poly.create_box(self.body,
+                                       ((SCREEN_SIZE[0] / screen_tiles[0]) - 16, SCREEN_SIZE[1] / screen_tiles[1] - 5),
+                                       5)
         self.poly.color = pg.Color("pink")
         self.poly.mass = 10  # Set the mass on the shape
         self.poly.elasticity = 1
@@ -22,7 +25,7 @@ class Character(pg.sprite.Sprite):
         self.left, self.right, self.up, self.down = False, False, False, False
         self.can_jump = False
 
-        self.size = (100*SCREEN_SIZE[0]/1920, 100*SCREEN_SIZE[1]/1080)
+        self.size = (100 * SCREEN_SIZE[0] / 1920, 100 * SCREEN_SIZE[1] / 1080)
         # self.img = pg.image.load('../data/assets/square_normal.PNG').convert_alpha()
         self.animations = dict()
         for key, value in Frog_Animations.items():
@@ -61,7 +64,6 @@ class Character(pg.sprite.Sprite):
         wall_slide_speed = 5
         velocity_x = self.body.velocity.x
         velocity_y = self.body.velocity.y
-
 
         if (0, 1) in collisions:  # Touching ground
             self.can_jump = True
@@ -142,12 +144,27 @@ class Character(pg.sprite.Sprite):
                     self.current_animation = 'fall'
                 else:
                     self.current_animation = 'jump'
-    
+
     def update_animation_push_object(self, collisions, collisions_wall, push_objects):
-        speed = 1.5 * 130/FRAMERATE
+        speed = 3 * 130 / FRAMERATE
         velocity_x = self.body.velocity.x
         velocity_y = self.body.velocity.y
+        touching = [box for box in push_objects if self.poly.shapes_collide(box.poly).points]
         if (0, 1) in collisions:  # Touching ground
+            self.can_jump = True
+            if not pg.key.get_pressed()[pg.K_d] and not pg.key.get_pressed()[pg.K_a]:
+                self.previous_animation = self.current_animation
+                if 'left' in self.previous_animation:
+                    self.current_animation = 'idle_left'
+                else:
+                    self.current_animation = 'idle'
+            elif pg.key.get_pressed()[pg.K_d]:
+                self.previous_animation = self.current_animation
+                self.current_animation = 'run'
+            elif pg.key.get_pressed()[pg.K_a]:
+                self.previous_animation = self.current_animation
+                self.current_animation = 'run_left'
+        if (0, -1) in collisions:  # Touching bottom
             self.can_jump = True
             if not pg.key.get_pressed()[pg.K_d] and not pg.key.get_pressed()[pg.K_a]:
                 self.previous_animation = self.current_animation
@@ -166,8 +183,8 @@ class Character(pg.sprite.Sprite):
             self.previous_animation = self.current_animation
             self.current_animation = 'run_left'
             if (-1, 0) not in collisions_wall:
-                self.body.position = (self.body.position.x, self.body.position.y)  # !!!!!
-                push_objects[0].body.position = (push_objects[0].body.position.x - speed, push_objects[0].body.position.y)
+                self.body.position = (self.body.position.x + 9*PLAYER_SPEED/10, self.body.position.y)  # !!!!!
+                touching[0].body.position = (touching[0].body.position.x - speed, touching[0].body.position.y)
             else:
                 self.body.position = (self.body.position.x + PLAYER_SPEED, self.body.position.y)
 
@@ -175,8 +192,8 @@ class Character(pg.sprite.Sprite):
             self.previous_animation = self.current_animation
             self.current_animation = 'run'
             if (1, 0) not in collisions_wall:
-                self.body.position = (self.body.position.x, self.body.position.y) # !!!!!
-                push_objects[0].body.position = (push_objects[0].body.position.x + speed, push_objects[0].body.position.y)
+                self.body.position = (self.body.position.x - 9*PLAYER_SPEED/10, self.body.position.y)  # !!!!!
+                touching[0].body.position = (touching[0].body.position.x + speed, touching[0].body.position.y)
             else:
                 self.body.position = (self.body.position.x - PLAYER_SPEED, self.body.position.y)
 
@@ -207,15 +224,10 @@ class Character(pg.sprite.Sprite):
             self.can_jump = False
 
     def draw(self, clock):
-        if clock % int(3*FRAMERATE/60) == 0:
+        if clock % int(3 * FRAMERATE / 60) == 0:
             self.frame += 1
         if self.frame >= len(self.animations[self.current_animation]):
             self.frame = 0
-        self.screen.blit(self.animations[self.current_animation][self.frame], (self.body.position.x - self.size[0]/2, self.body.position.y - self.size[1]/2 - self.size[1]/8), self.animations[self.current_animation][self.frame].get_rect())
-
-
-
-
-
-
-
+        self.screen.blit(self.animations[self.current_animation][self.frame], (
+        self.body.position.x - self.size[0] / 2, self.body.position.y - self.size[1] / 2 - self.size[1] / 8),
+                         self.animations[self.current_animation][self.frame].get_rect())

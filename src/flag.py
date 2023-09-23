@@ -1,4 +1,4 @@
-from settings import *
+from src.settings import *
 import pygame as pg
 import pymunk as pm
 
