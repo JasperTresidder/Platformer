@@ -16,7 +16,7 @@ class Wall(pg.sprite.Sprite):
         self.poly.mass = 100000 # Set the mass on the shape
         self.poly.elasticity = 0
         self.poly.density = 1000000
-        self.poly.friction = 0.9
+        self.poly.friction = 1
 
     def add_to_space(self):
         self.space.add(self.body, self.poly)  # Add both body and shape to the simulation

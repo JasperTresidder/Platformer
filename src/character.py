@@ -20,7 +20,7 @@ class Character(pg.sprite.Sprite):
                                        5)
         self.poly.color = pg.Color("pink")
         self.poly.mass = 10  # Set the mass on the shape
-        self.poly.elasticity = 1
+        self.poly.elasticity = 0
         self.poly.density = 1000
         self.poly.friction = 1
         self.body.moment = 100000000000000

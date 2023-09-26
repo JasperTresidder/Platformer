@@ -1,0 +1,1 @@
+butler push "builds/Flag Rush.zip" "JasperTresidder/flag-rush:windows" --userversion 0.0.6

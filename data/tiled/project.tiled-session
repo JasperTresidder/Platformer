@@ -3,8 +3,9 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "",
+    "activeFile": "level5.tmx",
     "expandedProjectPaths": [
+        "."
     ],
     "exportAsImage.drawTileGrid": false,
     "fileStates": {
@@ -12,8 +13,16 @@
             "scaleInDock": 1,
             "scaleInEditor": 1
         },
+        "Terrain (16x16).tsx": {
+            "scaleInDock": 1.5,
+            "scaleInEditor": 1
+        },
         "jungle tileset.tsx": {
             "dynamicWrapping": false,
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "jungle tileset2.tsx": {
             "scaleInDock": 1,
             "scaleInEditor": 1
         },
@@ -21,16 +30,16 @@
             "scale": 2.1236458333333332,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 234.73782312257813,
-                "y": 135.1449453082847
+                "x": 254.5151321920832,
+                "y": 243.92014519056264
             }
         },
         "level1.tmx": {
             "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 239.25,
-                "y": 131.5
+                "x": 240,
+                "y": 135.75
             }
         },
         "level2.tmx": {
@@ -38,7 +47,7 @@
             "selectedLayer": 0,
             "viewCenter": {
                 "x": 242.82565453470244,
-                "y": 135.21853663781516
+                "y": 135.2185366378152
             }
         },
         "level3.tmx": {
@@ -46,7 +55,7 @@
             "selectedLayer": 0,
             "viewCenter": {
                 "x": 240.24514811031662,
-                "y": 136.2507392075695
+                "y": 134.9604859953766
             }
         },
         "level4.tmx": {
@@ -54,8 +63,20 @@
             "selectedLayer": 1,
             "viewCenter": {
                 "x": 240.24514811031662,
-                "y": 136.2507392075695
+                "y": 136.25073920756947
             }
+        },
+        "level5.tmx": {
+            "scale": 1.9376041666666666,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 277.40444062147196,
+                "y": 170.829525294339
+            }
+        },
+        "spikes.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
         }
     },
     "last.exportedFilePath": "B:/Jasper/Python/Platformer/data/tiled",
@@ -66,9 +87,27 @@
     "map.tileHeight": 16,
     "map.tileWidth": 16,
     "openFiles": [
+        "jungle tileset2.tsx",
+        "level0.tmx",
+        "spikes.tsx",
+        "Terrain (16x16).tsx",
+        "level1.tmx",
+        "level2.tmx",
+        "level3.tmx",
+        "level4.tmx",
+        "level5.tmx"
     ],
     "project": "project.tiled-project",
     "recentFiles": [
+        "jungle tileset2.tsx",
+        "level0.tmx",
+        "spikes.tsx",
+        "Terrain (16x16).tsx",
+        "level1.tmx",
+        "level2.tmx",
+        "level3.tmx",
+        "level4.tmx",
+        "level5.tmx",
         "All items.tsx",
         "jungle tileset.tsx"
     ],

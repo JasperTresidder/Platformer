@@ -8,6 +8,8 @@ from src.push_obstacle import Obstacle
 from src.spike import Spike
 from src.flag import Flag
 from src.item import Item
+from src.timer import Timer
+from src.end_level_text import Menu
 
 BACKGROUNDS = [
     pg.image.load('data/raw/Background/' + filename).convert()
@@ -83,7 +85,7 @@ class App:
         self.running = True
         self.player = Character(self.space, self.screen, WALL_JUMP)
         self.level = LEVEL
-
+        self.menu = Menu(self.screen)
         # screen_dim = (150, 85)
         self.game_tick = 0
         self.time_hit_flag = 0
@@ -107,7 +109,7 @@ class App:
         """
         # print_options = pm.SpaceDebugDrawOptions()  # For easy printing
         options = DrawOptions(self.screen)
-
+        self.timer = Timer(self.screen)
         while self.running:
             self.handle_game_events()
             self.draw_background()
@@ -120,6 +122,7 @@ class App:
                     self.item.draw(self.game_tick)
                     self.player_collide_item()
             self.flag.draw(self.game_tick)
+            self.timer.draw()
             if DEBUG:
                 self.space.debug_draw(options)
             self.player_collide_wall()
@@ -143,6 +146,8 @@ class App:
                 if event.key == pg.K_ESCAPE:
                     pg.quit()
                     sys.exit(1)
+                if event.key == pg.K_r:
+                    self.reset_level()
             if event.type == pg.KEYUP:
                 self.player.handle_keyup(event)
 
@@ -203,22 +208,28 @@ class App:
     def player_collide_spike(self) -> None:
         for spike in self.spikes:
             if self.player.poly.shapes_collide(spike.poly).points:
-                self.player.body.position = SCREEN_SIZE[0] / 50, 4 * SCREEN_SIZE[1] / 10
-                for thing in self.push_objects:
-                    thing.body.position = thing.initial_position
-                    thing.body.angle = 0
-                if self.flag.got:
-                    self.flag.body.position = (
-                        self.flag_location_1[0] + self.flag.flag_size[0] / 2,
-                        self.flag_location_1[1] + self.flag.flag_size[1] / 2)
-                    self.flag.got = False
-                if self.level == 2:
-                    if self.item.got:
-                        self.item.body.position = self.item.initial_position
-                        self.item.got = False
-                        self.player.wall_jump = False
+                self.reset_level()
+
+
+    def reset_level(self):
+        self.player.body.position = SCREEN_SIZE[0] / 50, 4 * SCREEN_SIZE[1] / 10
+        self.timer.reset()
+        for thing in self.push_objects:
+            thing.body.position = thing.initial_position
+            thing.body.angle = 0
+        if self.flag.got:
+            self.flag.body.position = (
+                self.flag_location_1[0] + self.flag.flag_size[0] / 2,
+                self.flag_location_1[1] + self.flag.flag_size[1] / 2)
+            self.flag.got = False
+        if self.level == 3:
+            if self.item.got:
+                self.item.body.position = self.item.initial_position
+                self.item.got = False
+                self.player.wall_jump = False
 
     def next_level(self):
+        self.next_level_screen()
         if self.level == MAX_LEVEL:
             self.level = 0
         for thing in self.walls:
@@ -247,6 +258,17 @@ class App:
             thing.add_to_space()
         for thing in self.spikes:
             thing.add_to_space()
+        self.timer.reset()
+
+    def next_level_screen(self):
+        time = self.timer.get_ms_time()
+        while not pg.key.get_pressed()[pg.K_RETURN]:
+            self.handle_game_events()
+            self.menu.draw(time)
+            self.update()
+            if pg.key.get_pressed()[pg.K_r]:
+                self.level -= 1
+                break
 
 
 def Main():

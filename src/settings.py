@@ -11,19 +11,19 @@ DEBUG = False
 
 WALL_JUMP = False
 LEVEL = 1
-MAX_LEVEL = 4
+MAX_LEVEL = 5
 
 
 
 def resource_path(relative_path):
-    """ Get absolute path to resource, works for dev and for PyInstaller """
-    try:
-        # PyInstaller creates a temp folder and stores path in _MEIPASS
-        base_path = sys._MEIPASS
-    except Exception:
-        base_path = os.path.abspath(".")
+    # """ Get absolute path to resource, works for dev and for PyInstaller """
+    # try:
+    #     # PyInstaller creates a temp folder and stores path in _MEIPASS
+    #     base_path = sys._MEIPASS
+    # except Exception:
+    #     base_path = os.path.abspath(".")
 
-    return os.path.join(base_path, relative_path)
+    return relative_path
 
 
 
@@ -38,7 +38,7 @@ screen_tiles = (30, 17)
 SPACE = pm.Space()
 SCREEN_SIZE = (screen_s[0], screen_s[1])
 FRAMERATE = 80
-PLAYER_SPEED = 6*60/FRAMERATE
+PLAYER_SPEED = 6.1*60/FRAMERATE
 SCREEN = pg.display.set_mode(SCREEN_SIZE, vsync=True)
 pg.mouse.set_visible(False)
 
