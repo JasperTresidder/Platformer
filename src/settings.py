@@ -11,7 +11,7 @@ DEBUG = False
 
 WALL_JUMP = False
 LEVEL = 1
-MAX_LEVEL = 5
+MAX_LEVEL = 6
 
 
 

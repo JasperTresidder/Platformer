@@ -185,18 +185,20 @@ class Character(pg.sprite.Sprite):
         if (-1, 0) in collisions:  # Touching left wall
             self.previous_animation = self.current_animation
             self.current_animation = 'run_left'
+            for box in touching:
+                box.body.position = (box.body.position.x - speed, box.body.position.y)
             if (-1, 0) not in collisions_wall:
                 self.body.position = (self.body.position.x + 9*PLAYER_SPEED/10, self.body.position.y)  # !!!!!
-                touching[0].body.position = (touching[0].body.position.x - speed, touching[0].body.position.y)
             else:
                 self.body.position = (self.body.position.x + PLAYER_SPEED, self.body.position.y)
 
         if (1, 0) in collisions:  # Touching right wall
             self.previous_animation = self.current_animation
             self.current_animation = 'run'
+            for box in touching:
+                box.body.position = (box.body.position.x + speed, box.body.position.y)
             if (1, 0) not in collisions_wall:
                 self.body.position = (self.body.position.x - 9*PLAYER_SPEED/10, self.body.position.y)  # !!!!!
-                touching[0].body.position = (touching[0].body.position.x + speed, touching[0].body.position.y)
             else:
                 self.body.position = (self.body.position.x - PLAYER_SPEED, self.body.position.y)
 

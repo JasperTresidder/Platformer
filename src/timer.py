@@ -19,9 +19,17 @@ class Timer(pg.sprite.Sprite):
     def draw(self):
         self.end_time = time.time_ns()
         time_centi_seconds = str(round((self.end_time - self.start_time) / math.pow(10,9), 1)).ljust(3, '0')
-        text = self.font.render(time_centi_seconds, True, (255, 255, 255))
+        text = self.font.render(time_centi_seconds, True, (200, 0, 0))
         self.screen.blit(text,
                         (SCREEN_SIZE[0] - text.get_width() - 40, 40))
+
+        text = self.font.render('Esc - Exit', True, (255, 255, 255))
+        self.screen.blit(text,
+                         (SCREEN_SIZE[0] - text.get_width() - 40, 40 + text.get_height()))
+
+        text = self.font.render('R - Retry', True, (255, 255, 255))
+        self.screen.blit(text,
+                         (SCREEN_SIZE[0] - text.get_width() - 40, 40 + 2*text.get_height()))
 
     def get_ms_time(self) -> str:
         return str(round((self.end_time - self.start_time) / math.pow(10,9), 3)).ljust(6, '0')
