@@ -11,7 +11,7 @@ DEBUG = False
 
 WALL_JUMP = False
 LEVEL = 1
-MAX_LEVEL = 6
+MAX_LEVEL = 7
 
 
 
@@ -37,7 +37,7 @@ screen_tiles = (30, 17)
 
 SPACE = pm.Space()
 SCREEN_SIZE = (screen_s[0], screen_s[1])
-FRAMERATE = 80
+FRAMERATE = 150
 PLAYER_SPEED = 6.1*60/FRAMERATE
 SCREEN = pg.display.set_mode(SCREEN_SIZE, vsync=True)
 pg.mouse.set_visible(False)

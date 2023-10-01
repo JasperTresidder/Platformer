@@ -36,17 +36,17 @@ class Character(pg.sprite.Sprite):
         self.frame = 0
 
     def handle_keydown(self, event: pg.event.Event):
-        if event.key == pg.K_d:
+        if event.key == pg.K_d or event.key == pg.K_RIGHT:
             # Right
             self.right = True
             self.previous_animation = self.current_animation
             self.current_animation = 'run'
-        if event.key == pg.K_a:
+        if event.key == pg.K_a or event.key == pg.K_LEFT:
             # Left
             self.left = True
             self.previous_animation = self.current_animation
             self.current_animation = 'run_left'
-        if (event.key == pg.K_w or event.key == pg.K_SPACE) and self.can_jump:
+        if (event.key == pg.K_w or event.key == pg.K_SPACE or event.key == pg.K_UP) and self.can_jump:
             # UP
             self.up = True
             self.previous_animation = self.current_animation
@@ -56,10 +56,10 @@ class Character(pg.sprite.Sprite):
                 self.current_animation = 'jump'
 
     def handle_keyup(self, event: pg.event.Event):
-        if event.key == pg.K_d:
+        if event.key == pg.K_d or event.key == pg.K_RIGHT:
             # Right
             self.right = False
-        if event.key == pg.K_a:
+        if event.key == pg.K_a or event.key == pg.K_LEFT:
             # Left
             self.left = False
 
@@ -70,7 +70,8 @@ class Character(pg.sprite.Sprite):
 
         if (0, 1) in collisions:  # Touching ground
             self.can_jump = True
-            if not pg.key.get_pressed()[pg.K_d] and not pg.key.get_pressed()[pg.K_a]:
+            if not pg.key.get_pressed()[pg.K_d] and not pg.key.get_pressed()[pg.K_a] \
+                    and not pg.key.get_pressed()[pg.K_RIGHT] and not pg.key.get_pressed()[pg.K_LEFT]:
                 self.previous_animation = self.current_animation
                 if 'left' in self.previous_animation:
                     self.current_animation = 'idle_left'
@@ -91,10 +92,10 @@ class Character(pg.sprite.Sprite):
                 self.current_animation = 'idle'
             if velocity_y > 80:
                 self.body.velocity = (velocity_x, 80)
-            if not pg.key.get_pressed()[pg.K_a]:
+            if not pg.key.get_pressed()[pg.K_a] and not pg.key.get_pressed()[pg.K_LEFT]:
                 self.body.position = [self.body.position.x + 0.1, self.body.position.y]
                 self.current_animation = 'fall'
-        elif pg.key.get_pressed()[pg.K_a]:
+        elif pg.key.get_pressed()[pg.K_a] or pg.key.get_pressed()[pg.K_LEFT]:
             self.left = True
             if (0, 1) not in collisions:
                 self.previous_animation = self.current_animation
@@ -120,10 +121,10 @@ class Character(pg.sprite.Sprite):
                 self.current_animation = 'idle'
             if velocity_y > 80:
                 self.body.velocity = (velocity_x, 80)
-            if not pg.key.get_pressed()[pg.K_d]:
+            if not pg.key.get_pressed()[pg.K_d] and not pg.key.get_pressed()[pg.K_RIGHT]:
                 self.body.position = [self.body.position.x - 0.1, self.body.position.y]
                 self.current_animation = 'fall'
-        elif pg.key.get_pressed()[pg.K_d]:
+        elif pg.key.get_pressed()[pg.K_d] or pg.key.get_pressed()[pg.K_RIGHT]:
             self.right = True
             if (0, 1) not in collisions:
                 self.previous_animation = self.current_animation
@@ -148,7 +149,7 @@ class Character(pg.sprite.Sprite):
                 else:
                     self.current_animation = 'jump'
 
-    def update_animation_push_object(self, collisions, collisions_wall, push_objects):
+    def update_animation_push_object(self, collisions, push_objects, walls):
         speed = 3 * 130 / FRAMERATE
         velocity_x = self.body.velocity.x
         velocity_y = self.body.velocity.y
@@ -186,21 +187,25 @@ class Character(pg.sprite.Sprite):
             self.previous_animation = self.current_animation
             self.current_animation = 'run_left'
             for box in touching:
-                box.body.position = (box.body.position.x - speed, box.body.position.y)
-            if (-1, 0) not in collisions_wall:
-                self.body.position = (self.body.position.x + 9*PLAYER_SPEED/10, self.body.position.y)  # !!!!!
-            else:
-                self.body.position = (self.body.position.x + PLAYER_SPEED, self.body.position.y)
+                wall_collide = []
+                for wall in walls:
+                    normal = box.poly.shapes_collide(wall.poly).normal
+                    wall_collide.append((round(normal.x), round(normal.y)))
+                if (-1, 0) not in wall_collide:
+                    box.body.position = (box.body.position.x - speed, box.body.position.y)
+            self.body.position = (self.body.position.x + PLAYER_SPEED, self.body.position.y)
 
         if (1, 0) in collisions:  # Touching right wall
             self.previous_animation = self.current_animation
             self.current_animation = 'run'
             for box in touching:
-                box.body.position = (box.body.position.x + speed, box.body.position.y)
-            if (1, 0) not in collisions_wall:
-                self.body.position = (self.body.position.x - 9*PLAYER_SPEED/10, self.body.position.y)  # !!!!!
-            else:
-                self.body.position = (self.body.position.x - PLAYER_SPEED, self.body.position.y)
+                wall_collide = []
+                for wall in walls:
+                    normal = box.poly.shapes_collide(wall.poly).normal
+                    wall_collide.append((round(normal.x), round(normal.y)))
+                if (1, 0) not in wall_collide:
+                    box.body.position = (box.body.position.x + speed, box.body.position.y)
+            self.body.position = (self.body.position.x - PLAYER_SPEED, self.body.position.y)
 
         if (1, 0) not in collisions and (-1, 0) not in collisions and (0, 1) not in collisions and -velocity_y > 1:
             self.previous_animation = self.current_animation

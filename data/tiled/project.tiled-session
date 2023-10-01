@@ -74,6 +74,14 @@
                 "y": 170.829525294339
             }
         },
+        "level6.tmx": {
+            "scale": 1.5,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 212.66666666666669,
+                "y": 101.33333333333331
+            }
+        },
         "spikes.tsx": {
             "scaleInDock": 1,
             "scaleInEditor": 1

@@ -157,6 +157,7 @@ class App:
         :return:
         """
         self.player.update()
+        self.curr_fps = self.game_clock.get_fps()
         self.game_clock.tick(FRAMERATE)
         self.game_tick += 1
         self.curr_fps = self.game_clock.get_fps()
@@ -168,25 +169,21 @@ class App:
         self.screen.blit(self.level_image, (0, 0), self.level_image.get_rect())
 
     def player_collide_wall(self) -> None:
-        collisions = []
+        player_wall_collisions = []
         for wall in self.walls:
             if not wall.is_boundary:
                 normal = self.player.poly.shapes_collide(wall.poly).normal
-                collisions.append((round(normal.x), round(normal.y)))
+                player_wall_collisions.append((round(normal.x), round(normal.y)))
 
-        self.player.update_animation_wall(collisions)
+        self.player.update_animation_wall(player_wall_collisions)
 
     def player_collide_push_object(self) -> None:
-        collisions = []
-        collisions_wall = []
+        player_box_collisions = []
         for thing in self.push_objects:
             normal = self.player.poly.shapes_collide(thing.poly).normal
-            collisions.append((round(normal.x), round(normal.y)))
-        for wall in self.walls:
-            normal = self.push_objects[0].poly.shapes_collide(wall.poly).normal
-            collisions_wall.append((round(normal.x), round(normal.y)))
+            player_box_collisions.append((round(normal.x), round(normal.y)))
 
-        self.player.update_animation_push_object(collisions, collisions_wall, self.push_objects)
+        self.player.update_animation_push_object(player_box_collisions, self.push_objects, self.walls)
 
     def player_collide_flag(self) -> None:
         if self.player.poly.shapes_collide(self.flag.poly).points:
