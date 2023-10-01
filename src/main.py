@@ -1,4 +1,5 @@
 import os
+import pickle
 import sys
 from pymunk.pygame_util import DrawOptions
 from src.character import Character
@@ -10,6 +11,7 @@ from src.flag import Flag
 from src.item import Item
 from src.timer import Timer
 from src.end_level_text import Menu
+from src.ai import Ai
 
 BACKGROUNDS = [
     pg.image.load('data/raw/Background/' + filename).convert()
@@ -79,6 +81,10 @@ class App:
     def __init__(self, screen: pg.Surface, space: pm.Space):
         self.screen = screen
         self.space = space
+        self.started = False
+        self.can_start = False
+        if AI:
+            self.started = True
         self.curr_fps = FRAMERATE
         self.space.gravity = 0, 1800  # * 1080/SCREEN_SIZE[1]
         self.game_clock = pg.time.Clock()
@@ -86,9 +92,15 @@ class App:
         self.player = Character(self.space, self.screen, WALL_JUMP)
         self.level = LEVEL
         self.menu = Menu(self.screen)
+        self.ai = Ai(self.player)
         # screen_dim = (150, 85)
-        self.game_tick = 0
+        self.game_tick = 1
+        if AI:
+            self.game_tick = -120
+            self.can_start = True
+        self.level_end = False
         self.time_hit_flag = 0
+        self.events = [[] for i in range(20000)]
         self.walls, self.push_objects, self.spikes, self.flag, self.flag_location_1, self.flag_location_2, self.item, self.level_image = load_level(
             self.level)
         if self.item is not None:
@@ -111,24 +123,24 @@ class App:
         options = DrawOptions(self.screen)
         self.timer = Timer(self.screen)
         while self.running:
-            self.handle_game_events()
             self.draw_background()
             # Print the state of the simulation
-            self.player.draw(self.game_tick)
+            self.player.draw(self.game_tick, self.started)
             for thing in self.push_objects:
                 thing.draw()
             if self.item is not None:
                 if not self.item.got:
-                    self.item.draw(self.game_tick)
+                    self.item.draw(self.game_tick, self.started)
                     self.player_collide_item()
-            self.flag.draw(self.game_tick)
-            self.timer.draw()
+            self.flag.draw(self.game_tick, self.started)
+            self.timer.draw(self.game_tick)
             if DEBUG:
                 self.space.debug_draw(options)
             self.player_collide_wall()
             self.player_collide_push_object()
             self.player_collide_flag()
             self.player_collide_spike()
+            self.handle_game_events()
             self.update()
             self.space.step(0.02 * 60 / FRAMERATE)  # Step the simulation one step forward
 
@@ -137,19 +149,26 @@ class App:
         Handle events such as inputs and exit screen
         :return:
         """
+        if AI:
+            self.ai.handle_events(self.game_tick)
         for event in pg.event.get():
+            if not AI and not self.level_end:
+                self.events[self.game_tick].append([event.type, event.dict])
             if event.type == pg.QUIT:
                 pg.quit()
                 sys.exit(1)
-            if event.type == pg.KEYDOWN:
-                self.player.handle_keydown(event)
+            if event.type == pg.KEYDOWN and self.can_start:
+                self.started = True
+                if not AI:
+                    self.player.handle_keydown(event)
                 if event.key == pg.K_ESCAPE:
                     pg.quit()
                     sys.exit(1)
-                if event.key == pg.K_r:
+                if event.key == pg.K_r and not AI:
                     self.reset_level()
-            if event.type == pg.KEYUP:
+            elif event.type == pg.KEYUP and not AI:
                 self.player.handle_keyup(event)
+
 
     def update(self) -> None:
         """
@@ -159,7 +178,8 @@ class App:
         self.player.update()
         self.curr_fps = self.game_clock.get_fps()
         self.game_clock.tick(FRAMERATE)
-        self.game_tick += 1
+        if self.started:
+            self.game_tick += 1
         self.curr_fps = self.game_clock.get_fps()
         pg.display.set_caption(str(self.curr_fps))
         pg.display.flip()
@@ -170,6 +190,7 @@ class App:
 
     def player_collide_wall(self) -> None:
         player_wall_collisions = []
+        self.can_start = True
         for wall in self.walls:
             if not wall.is_boundary:
                 normal = self.player.poly.shapes_collide(wall.poly).normal
@@ -187,14 +208,14 @@ class App:
 
     def player_collide_flag(self) -> None:
         if self.player.poly.shapes_collide(self.flag.poly).points:
-            if not self.flag.got and self.game_tick - self.time_hit_flag > 30:
+            if not self.flag.got:
                 self.flag.body.position = (
                     self.flag_location_2[0] + self.flag.flag_size[0] / 2,
                     self.flag_location_2[1] + self.flag.flag_size[1] / 2)
                 self.flag.got = True
                 self.time_hit_flag = self.game_tick
-            elif self.game_tick - self.time_hit_flag > 30:
-                self.next_level()
+            else:
+                self.next_level(0)
 
     def player_collide_item(self) -> None:
         if self.player.poly.shapes_collide(self.item.poly).points:
@@ -205,14 +226,21 @@ class App:
     def player_collide_spike(self) -> None:
         for spike in self.spikes:
             if self.player.poly.shapes_collide(spike.poly).points:
-                self.reset_level()
+                self.next_level(1)
+                break
 
 
     def reset_level(self):
         self.player.body.position = SCREEN_SIZE[0] / 50, 4 * SCREEN_SIZE[1] / 10
+        self.player.body.velocity = (0, 0)
         self.timer.reset()
+        self.game_tick = 1
+        if AI:
+            self.game_tick = -120
+        self.events = [[] for i in range(20000)]
         for thing in self.push_objects:
             thing.body.position = thing.initial_position
+            thing.body.velocity = (0, 0)
             thing.body.angle = 0
         if self.flag.got:
             self.flag.body.position = (
@@ -224,9 +252,18 @@ class App:
                 self.item.body.position = self.item.initial_position
                 self.item.got = False
                 self.player.wall_jump = False
+        self.player.right = False
+        self.player.left = False
+        self.started = False
+        # if pg.key.get_pressed()[pg.K_a] or pg.key.get_pressed()[pg.K_LEFT]:
+        #     self.events[0] = [[pg.KEYDOWN, {'key': pg.K_a}]]
+        # elif pg.key.get_pressed()[pg.K_d] or pg.key.get_pressed()[pg.K_RIGHT]:
+        #     self.events[0] = [[pg.KEYDOWN, {'key': pg.K_d}]]
 
-    def next_level(self):
-        self.next_level_screen()
+    def next_level(self, i):
+        if i != 1:
+            self.next_level_screen()
+        self.level_end = False
         if self.level == MAX_LEVEL:
             self.level = 0
         for thing in self.walls:
@@ -239,8 +276,8 @@ class App:
         self.space.remove(self.player.body, self.player.poly)
         if self.item is not None:
             self.space.remove(self.item.body, self.item.poly)
-
-        self.level += 1
+        if i != 1:
+            self.level += 1
         self.walls, self.push_objects, self.spikes, self.flag, self.flag_location_1, self.flag_location_2, self.item, self.level_image = load_level(
             self.level)
         self.player = Character(self.space, self.screen, self.player.wall_jump)
@@ -256,13 +293,20 @@ class App:
         for thing in self.spikes:
             thing.add_to_space()
         self.timer.reset()
+        self.reset_level()
+        self.started = False
 
     def next_level_screen(self):
-        time = self.timer.get_ms_time()
+        if not AI:
+            file = open('pickle_level', 'wb')
+            pickle.dump(self.events, file)
+            file.close()
+        self.level_end = True
         while not pg.key.get_pressed()[pg.K_RETURN]:
             self.handle_game_events()
-            self.menu.draw(time)
+            self.menu.draw(self.game_tick)
             self.update()
+            self.game_tick -= 1
             if pg.key.get_pressed()[pg.K_r]:
                 self.level -= 1
                 break

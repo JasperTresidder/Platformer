@@ -20,19 +20,14 @@ class Timer(pg.sprite.Sprite):
 
 
 
-    def draw(self):
-        self.end_time = time.time_ns()
-        time_centi_seconds = str(round((self.end_time - self.start_time) / math.pow(10,9), 1)).ljust(3, '0')
-        text = self.font.render(time_centi_seconds, True, (200, 0, 0))
+    def draw(self, frames):
+        time_frames = str(round(frames/100, 1)).ljust(3, '0')
+        text = self.font.render(time_frames, True, (200, 0, 0))
         self.screen.blit(text,
                         (SCREEN_SIZE[0] - text.get_width() - 40, 40))
         self.screen.blit(self.text0, self.text0_dest)
         self.screen.blit(self.text1, self.text1_dest)
 
-
-
-    def get_ms_time(self) -> str:
-        return str(round((self.end_time - self.start_time) / math.pow(10,9), 3)).ljust(6, '0')
     def reset(self):
         self.start_time = time.time_ns()
 

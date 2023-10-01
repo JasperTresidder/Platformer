@@ -28,9 +28,10 @@ class Item(pg.sprite.Sprite):
     def add_to_space(self):
         self.space.add(self.body, self.poly)  # Add both body and shape to the simulation
 
-    def draw(self, clock):
+    def draw(self, clock, started):
         if clock % int(3 * FRAMERATE / 60) == 0:
-            self.frame += 1
+            if started:
+                self.frame += 1
         if self.frame >= len(self.imgs):
             self.frame = 0
         self.body.angle = 0

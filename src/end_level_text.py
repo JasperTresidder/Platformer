@@ -10,8 +10,8 @@ class Menu:
         self.text = None
 
 
-    def draw(self, time):
-        text = "Level Time: " + time
+    def draw(self, frame_count):
+        text = "Level Time: " + str(frame_count) + " Frames!"
         text_blit = self.font.render(text, True, (255, 255, 255), (0,0,0))
         self.screen.blit(text_blit,
                          (SCREEN_SIZE[0]/2 - text_blit.get_width()/2, SCREEN_SIZE[1]/2 - text_blit.get_height()))
