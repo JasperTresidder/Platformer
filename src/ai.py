@@ -1,14 +1,20 @@
 # 0 nothing, 1 left, 2 right, 3 up, 4 left and up, 5 right and up
 # reward time spent, distance to flag.
+import os
 import pickle
-
 import pygame as pg
 
 class Ai:
-    def __init__(self, player):
+    def __init__(self, player, level):
         self.tick = 0
-        file = open('pickle_level', 'rb')
-        self.gene = pickle.load(file)
+        files = os.listdir('data/saves/' + str(level))
+        if len(files) > 10:
+            os.remove('data/saves/' + str(level) + '/' + files[-1])
+        if files:
+            file = open('data/saves/' + str(level) + '/' + files[0], 'rb')
+            self.gene = pickle.load(file)
+        else:
+            raise "No Saved Files"
 
         self.player = player
 

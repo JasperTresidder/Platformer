@@ -83,8 +83,6 @@ class App:
         self.space = space
         self.started = False
         self.can_start = False
-        if AI:
-            self.started = True
         self.curr_fps = FRAMERATE
         self.space.gravity = 0, 1800  # * 1080/SCREEN_SIZE[1]
         self.game_clock = pg.time.Clock()
@@ -92,12 +90,14 @@ class App:
         self.player = Character(self.space, self.screen, WALL_JUMP)
         self.level = LEVEL
         self.menu = Menu(self.screen)
-        self.ai = Ai(self.player)
+
         # screen_dim = (150, 85)
         self.game_tick = 1
         if AI:
             self.game_tick = -120
             self.can_start = True
+            self.started = True
+            self.ai = Ai(self.player, self.level)
         self.level_end = False
         self.time_hit_flag = 0
         self.events = [[] for i in range(20000)]
@@ -164,8 +164,8 @@ class App:
                 if event.key == pg.K_ESCAPE:
                     pg.quit()
                     sys.exit(1)
-                if event.key == pg.K_r and not AI:
-                    self.reset_level()
+                if event.key == pg.K_r:
+                    self.next_level(1)
             elif event.type == pg.KEYUP and not AI:
                 self.player.handle_keyup(event)
 
@@ -252,9 +252,14 @@ class App:
                 self.item.body.position = self.item.initial_position
                 self.item.got = False
                 self.player.wall_jump = False
-        self.player.right = False
-        self.player.left = False
         self.started = False
+        self.can_start = False
+        if AI:
+            self.can_start = True
+            self.started = True
+        else:
+            self.player.right = False
+            self.player.left = False
         # if pg.key.get_pressed()[pg.K_a] or pg.key.get_pressed()[pg.K_LEFT]:
         #     self.events[0] = [[pg.KEYDOWN, {'key': pg.K_a}]]
         # elif pg.key.get_pressed()[pg.K_d] or pg.key.get_pressed()[pg.K_RIGHT]:
@@ -294,12 +299,13 @@ class App:
             thing.add_to_space()
         self.timer.reset()
         self.reset_level()
-        self.started = False
+        if AI:
+            self.ai = Ai(self.player, self.level)
 
     def next_level_screen(self):
         if not AI:
-            file = open('pickle_level', 'wb')
-            pickle.dump(self.events, file)
+            file = open('data/saves/' + str(self.level) + '/run_' + str(self.game_tick), 'wb')
+            pickle.dump(self.events[0:self.game_tick + 20], file)
             file.close()
         self.level_end = True
         while not pg.key.get_pressed()[pg.K_RETURN]:
