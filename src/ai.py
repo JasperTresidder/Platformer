@@ -3,15 +3,16 @@
 import os
 import pickle
 import pygame as pg
+from src.settings import resource_path
 
 class Ai:
     def __init__(self, player, level):
         self.tick = 0
-        files = os.listdir('data/saves/' + str(level))
+        files = os.listdir(resource_path('data/saves/' + str(level)))
         if len(files) > 10:
             os.remove('data/saves/' + str(level) + '/' + files[-1])
         if files:
-            file = open('data/saves/' + str(level) + '/' + files[0], 'rb')
+            file = open(resource_path('data/saves/' + str(level) + '/' + files[0]), 'rb')
             self.gene = pickle.load(file)
         else:
             raise "No Saved Files"

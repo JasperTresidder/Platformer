@@ -79,6 +79,7 @@ def load_level(level_number: int):
 
 class App:
     def __init__(self, screen: pg.Surface, space: pm.Space):
+        pg.display.set_caption("Flag Rush")
         self.screen = screen
         self.space = space
         self.started = False
@@ -190,7 +191,6 @@ class App:
         if self.started:
             self.game_tick += 1
         self.curr_fps = self.game_clock.get_fps()
-        pg.display.set_caption(str(self.curr_fps))
         pg.display.flip()
 
     def draw_background(self) -> None:
@@ -242,7 +242,6 @@ class App:
     def reset_level(self):
         self.player.body.position = SCREEN_SIZE[0] / 50, 4 * SCREEN_SIZE[1] / 10
         self.player.body.velocity = (0, 0)
-        self.timer.reset()
         self.game_tick = 1
         if self.replay_on:
             self.game_tick = -120
@@ -310,7 +309,6 @@ class App:
             thing.add_to_space()
         for thing in self.spikes:
             thing.add_to_space()
-        self.timer.reset()
         self.reset_level()
         if self.level > 3:
             self.player.wall_jump = True
@@ -321,7 +319,7 @@ class App:
 
     def next_level_screen(self):
         if not self.replay_on:
-            file = open('data/saves/' + str(self.level) + '/run_' + str(self.game_tick), 'wb')
+            file = open(resource_path('data/saves/' + str(self.level) + '/run_' + str(self.game_tick)), 'wb')
             pickle.dump(self.events[0:self.game_tick + 20], file)
             file.close()
         self.level_end = True

@@ -12,7 +12,7 @@ DEBUG = False
 AI = False
 WALL_JUMP = False
 LEVEL = 1
-MAX_LEVEL = 7
+MAX_LEVEL = 6
 
 
 

@@ -8,19 +8,16 @@ class Timer(pg.sprite.Sprite):
     def __init__(self, screen: pg.Surface):
         super().__init__()
         self.screen = screen
-        self.font = pg.font.get_fonts()
-        #self.font = pg.font.SysFont("ariel", 30)
         self.font = pg.font.Font('data/fonts/Grand9K Pixel.ttf', 30)
         self.text0 = self.font.render('Esc - Exit', True, (255, 255, 255))
-        self.text0_dest = SCREEN_SIZE[0] - self.text0.get_width() - 40, 40 + self.text0.get_height()
+        self.text0_dest = SCREEN_SIZE[0] - self.text0.get_width() - 40, 40 + 2 * self.text0.get_height()
         self.text1 = self.font.render('R - Retry', True, (255, 255, 255))
-        self.text1_dest = SCREEN_SIZE[0] - self.text1.get_width() - 40, 40 + 2 * self.text1.get_height()
+        self.text1_dest = SCREEN_SIZE[0] - self.text1.get_width() - 40, 40 + 3 * self.text1.get_height()
         self.text2 = self.font.render('T - Toggle Replay', True, (255, 255, 255))
-        self.text2_dest = SCREEN_SIZE[0] - self.text2.get_width() - 40, 40 + 3 * self.text1.get_height()
+        self.text2_dest = SCREEN_SIZE[0] - self.text2.get_width() - 40, 40 + self.text1.get_height()
         self.ai_text = self.font.render('RECORD REPLAY', True, (0, 200, 0))
         self.ai_dest = SCREEN_SIZE[0]/2 - self.text1.get_width()/2 - 40, 40
-        self.start_time = time.time_ns()
-        self.end_time = None
+
 
 
 
@@ -37,6 +34,4 @@ class Timer(pg.sprite.Sprite):
         if ai:
             self.screen.blit(self.ai_text, self.ai_dest)
 
-    def reset(self):
-        self.start_time = time.time_ns()
 
