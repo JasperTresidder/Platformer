@@ -15,12 +15,16 @@ class Timer(pg.sprite.Sprite):
         self.text0_dest = SCREEN_SIZE[0] - self.text0.get_width() - 40, 40 + self.text0.get_height()
         self.text1 = self.font.render('R - Retry', True, (255, 255, 255))
         self.text1_dest = SCREEN_SIZE[0] - self.text1.get_width() - 40, 40 + 2 * self.text1.get_height()
+        self.text2 = self.font.render('T - Toggle Replay', True, (255, 255, 255))
+        self.text2_dest = SCREEN_SIZE[0] - self.text2.get_width() - 40, 40 + 3 * self.text1.get_height()
+        self.ai_text = self.font.render('RECORD REPLAY', True, (0, 200, 0))
+        self.ai_dest = SCREEN_SIZE[0]/2 - self.text1.get_width()/2 - 40, 40
         self.start_time = time.time_ns()
         self.end_time = None
 
 
 
-    def draw(self, frames):
+    def draw(self, frames, ai):
         if frames < 0:
             frames = 0
         time_frames = str(round(frames/100, 1)).ljust(3, '0')
@@ -29,6 +33,9 @@ class Timer(pg.sprite.Sprite):
                         (SCREEN_SIZE[0] - text.get_width() - 40, 40))
         self.screen.blit(self.text0, self.text0_dest)
         self.screen.blit(self.text1, self.text1_dest)
+        self.screen.blit(self.text2, self.text2_dest)
+        if ai:
+            self.screen.blit(self.ai_text, self.ai_dest)
 
     def reset(self):
         self.start_time = time.time_ns()

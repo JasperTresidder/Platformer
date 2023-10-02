@@ -90,10 +90,11 @@ class App:
         self.player = Character(self.space, self.screen, WALL_JUMP)
         self.level = LEVEL
         self.menu = Menu(self.screen)
+        self.replay_on = AI
 
         # screen_dim = (150, 85)
         self.game_tick = 1
-        if AI:
+        if self.replay_on:
             self.game_tick = -120
             self.can_start = True
             self.started = True
@@ -133,7 +134,7 @@ class App:
                     self.item.draw(self.game_tick, self.started)
                     self.player_collide_item()
             self.flag.draw(self.game_tick, self.started)
-            self.timer.draw(self.game_tick)
+            self.timer.draw(self.game_tick, self.replay_on)
             if DEBUG:
                 self.space.debug_draw(options)
             self.player_collide_wall()
@@ -149,24 +150,32 @@ class App:
         Handle events such as inputs and exit screen
         :return:
         """
-        if AI:
+        if self.replay_on:
             self.ai.handle_events(self.game_tick)
         for event in pg.event.get():
-            if not AI and not self.level_end:
+            if not self.replay_on and not self.level_end:
                 self.events[self.game_tick].append([event.type, event.dict])
             if event.type == pg.QUIT:
                 pg.quit()
                 sys.exit(1)
             if event.type == pg.KEYDOWN and self.can_start:
                 self.started = True
-                if not AI:
+                if not self.replay_on:
                     self.player.handle_keydown(event)
                 if event.key == pg.K_ESCAPE:
                     pg.quit()
                     sys.exit(1)
                 if event.key == pg.K_r:
                     self.next_level(1)
-            elif event.type == pg.KEYUP and not AI:
+                if event.key == pg.K_t:
+                    self.replay_on = not self.replay_on
+                    self.next_level(1)
+                if event.key == 61:
+                    self.next_level(2)
+                if event.key == 45:
+                    self.level -= 1
+                    self.next_level(3)
+            elif event.type == pg.KEYUP and not self.replay_on:
                 self.player.handle_keyup(event)
 
 
@@ -235,7 +244,7 @@ class App:
         self.player.body.velocity = (0, 0)
         self.timer.reset()
         self.game_tick = 1
-        if AI:
+        if self.replay_on:
             self.game_tick = -120
         self.events = [[] for i in range(20000)]
         for thing in self.push_objects:
@@ -254,7 +263,7 @@ class App:
                 self.player.wall_jump = False
         self.started = False
         self.can_start = False
-        if AI:
+        if self.replay_on:
             self.can_start = True
             self.started = True
         else:
@@ -266,7 +275,7 @@ class App:
         #     self.events[0] = [[pg.KEYDOWN, {'key': pg.K_d}]]
 
     def next_level(self, i):
-        if i != 1:
+        if i != 1 and i != 2 and i != 3:
             self.next_level_screen()
         self.level_end = False
         if self.level == MAX_LEVEL:
@@ -283,6 +292,10 @@ class App:
             self.space.remove(self.item.body, self.item.poly)
         if i != 1:
             self.level += 1
+        if i == 3:
+            self.level -= 1
+        if self.level == 0:
+            self.level = MAX_LEVEL
         self.walls, self.push_objects, self.spikes, self.flag, self.flag_location_1, self.flag_location_2, self.item, self.level_image = load_level(
             self.level)
         self.player = Character(self.space, self.screen, self.player.wall_jump)
@@ -299,11 +312,15 @@ class App:
             thing.add_to_space()
         self.timer.reset()
         self.reset_level()
-        if AI:
+        if self.level > 3:
+            self.player.wall_jump = True
+        else:
+            self.player.wall_jump = False
+        if self.replay_on:
             self.ai = Ai(self.player, self.level)
 
     def next_level_screen(self):
-        if not AI:
+        if not self.replay_on:
             file = open('data/saves/' + str(self.level) + '/run_' + str(self.game_tick), 'wb')
             pickle.dump(self.events[0:self.game_tick + 20], file)
             file.close()

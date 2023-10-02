@@ -9,10 +9,9 @@ import numpy as np
 DEBUG = False
 #############
 
-AI = True
-
+AI = False
 WALL_JUMP = False
-LEVEL = 3
+LEVEL = 1
 MAX_LEVEL = 7
 
 

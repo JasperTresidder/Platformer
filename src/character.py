@@ -127,11 +127,12 @@ class Character(pg.sprite.Sprite):
         elif self.left:
             self.can_move_left = True
             if (0, 1) not in collisions:
-                self.previous_animation = self.current_animation
-                if velocity_y > 40:
-                    self.current_animation = 'fall_left'
-                else:
-                    self.current_animation = 'jump_left'
+                if 'wall' not in self.current_animation:
+                    self.previous_animation = self.current_animation
+                    if velocity_y > 40:
+                        self.current_animation = 'fall_left'
+                    else:
+                        self.current_animation = 'jump_left'
             else:
                 self.previous_animation = self.current_animation
                 self.current_animation = 'run_left'
@@ -155,12 +156,13 @@ class Character(pg.sprite.Sprite):
                 self.current_animation = 'fall'
         elif self.right:
             self.can_move_right = True
-            if collisions == []:
-                self.previous_animation = self.current_animation
-                if velocity_y > 40:
-                    self.current_animation = 'fall'
-                else:
-                    self.current_animation = 'jump'
+            if (0, 1) not in collisions:
+                if 'wall' not in self.current_animation:
+                    self.previous_animation = self.current_animation
+                    if velocity_y > 40:
+                        self.current_animation = 'fall'
+                    else:
+                        self.current_animation = 'jump'
             else:
                 self.previous_animation = self.current_animation
                 self.current_animation = 'run'
