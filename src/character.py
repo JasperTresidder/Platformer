@@ -155,7 +155,7 @@ class Character(pg.sprite.Sprite):
                 self.current_animation = 'fall'
         elif self.right:
             self.can_move_right = True
-            if (0, 1) not in collisions:
+            if collisions == []:
                 self.previous_animation = self.current_animation
                 if velocity_y > 40:
                     self.current_animation = 'fall'
@@ -250,10 +250,9 @@ class Character(pg.sprite.Sprite):
                     self.current_animation = 'jump'
 
     def update(self):
-        self.body.angle = 0
-        if self.right and self.can_move_right and 'wall' not in self.current_animation:
+        if self.right and self.can_move_right:
             self.body.position += (PLAYER_SPEED*SCREEN_SIZE[0]/1920 + self.screen_adjust/230, 0)
-        if self.left and self.can_move_left and 'wall' not in self.current_animation:
+        if self.left and self.can_move_left:
             self.body.position += (-PLAYER_SPEED*SCREEN_SIZE[0]/1920 - self.screen_adjust/230, 0)
         if not self.left and not self.right:
             self.body.velocity = (0, self.body.velocity.y)
@@ -261,6 +260,7 @@ class Character(pg.sprite.Sprite):
             self.body.velocity += (0, -870*SCREEN_SIZE[1]/1080 - self.screen_adjust)
             self.up = False
             self.can_jump = False
+        self.body.angle = 0
 
     def draw(self, clock, started):
         if clock % int(3 * FRAMERATE / 60) == 0:

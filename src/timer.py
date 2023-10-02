@@ -21,6 +21,8 @@ class Timer(pg.sprite.Sprite):
 
 
     def draw(self, frames):
+        if frames < 0:
+            frames = 0
         time_frames = str(round(frames/100, 1)).ljust(3, '0')
         text = self.font.render(time_frames, True, (200, 0, 0))
         self.screen.blit(text,
