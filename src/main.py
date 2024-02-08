@@ -191,6 +191,7 @@ class App:
         if self.started:
             self.game_tick += 1
         self.curr_fps = self.game_clock.get_fps()
+        pg.display.set_caption(str(self.curr_fps))
         pg.display.flip()
 
     def draw_background(self) -> None:
@@ -322,6 +323,12 @@ class App:
             file = open(resource_path('data/saves/' + str(self.level) + '/run_' + str(self.game_tick)), 'wb')
             pickle.dump(self.events[0:self.game_tick + 20], file)
             file.close()
+            files = os.listdir(resource_path('data/saves/' + str(self.level)))
+            delete = 1;
+            while len(files) > 10:
+                os.remove('data/saves/' + str(self.level) + '/' + files[-delete])
+                files.pop()
+                delete += 1
         self.level_end = True
         while not pg.key.get_pressed()[pg.K_RETURN]:
             self.handle_game_events()

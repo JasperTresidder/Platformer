@@ -9,8 +9,6 @@ class Ai:
     def __init__(self, player, level):
         self.tick = 0
         files = os.listdir(resource_path('data/saves/' + str(level)))
-        if len(files) > 10:
-            os.remove('data/saves/' + str(level) + '/' + files[-1])
         if files:
             file = open(resource_path('data/saves/' + str(level) + '/' + files[0]), 'rb')
             self.gene = pickle.load(file)

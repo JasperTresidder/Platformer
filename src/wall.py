@@ -13,7 +13,7 @@ class Wall(pg.sprite.Sprite):
 
         self.poly = pm.Poly.create_box(self.body, size)  # Create a box shape and attach to body
         self.poly.color = pg.Color("blue")
-        self.poly.mass = 100000 # Set the mass on the shape
+        self.poly.mass = 30 # Set the mass on the shape
         self.poly.elasticity = 0
         self.poly.density = 1000000
         self.poly.friction = 1

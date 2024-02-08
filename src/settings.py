@@ -52,7 +52,7 @@ pg.mouse.set_visible(False)
 # Level0_Dynamic = [Obstacle(SCREEN, SPACE, (120, 120), (SCREEN_SIZE[0]/2 -30, SCREEN_SIZE[1] / 1.5))]
 
 CHARACTERS = ['Ninja Frog', 'Mask Dude', 'Pink Man', 'Virtual Guy']
-CHARACTER = CHARACTERS[3]
+CHARACTER = CHARACTERS[2]
 
 Character_Spritesheets = {
     'idle': pg.image.load(resource_path("data/assets/Main Characters/" + CHARACTER + "/Idle (32x32).png")).convert_alpha(),
