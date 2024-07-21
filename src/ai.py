@@ -8,12 +8,13 @@ from src.settings import resource_path
 class Ai:
     def __init__(self, player, level):
         self.tick = 0
+        self.valid = True
         files = os.listdir(resource_path('data/saves/' + str(level)))
-        if files:
-            file = open(resource_path('data/saves/' + str(level) + '/' + files[0]), 'rb')
+        if len(files) > 1:
+            file = open(resource_path('data/saves/' + str(level) + '/' + files[1]), 'rb')
             self.gene = pickle.load(file)
         else:
-            raise "No Saved Files"
+            self.valid = False
 
         self.player = player
 

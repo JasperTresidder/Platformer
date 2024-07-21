@@ -93,15 +93,19 @@ class App:
         self.player = Character(self.space, self.screen, WALL_JUMP)
         self.level = LEVEL
         self.menu = Menu(self.screen)
-        self.replay_on = AI
+        self.replay_on = False
 
         # screen_dim = (150, 85)
         self.game_tick = 1
         if self.replay_on:
-            self.game_tick = -120
-            self.can_start = True
-            self.started = True
             self.ai = Ai(self.player, self.level)
+            if self.ai.valid:
+                self.game_tick = -120
+                self.can_start = True
+                self.started = True
+            else:
+                self.replay_on = False
+            
         self.level_end = False
         self.time_hit_flag = 0
         self.events = [[] for i in range(20000)]
@@ -318,6 +322,8 @@ class App:
             self.player.wall_jump = False
         if self.replay_on:
             self.ai = Ai(self.player, self.level)
+            if not self.ai.valid:
+                self.replay_on = False
         if DEBUG:
             print(self.level)
 

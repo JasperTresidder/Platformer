@@ -1,2 +1,2 @@
-butler push "builds/Flag Rush.zip" "JasperTresidder/flag-rush:windows" --userversion 0.0.10
-butler push "builds/Flag Rush 150.zip" "JasperTresidder/flag-rush:windows-150fps" --userversion 0.0.1
+butler push "builds/Flag Rush.zip" "JasperTresidder/flag-rush:windows" --userversion 0.0.11
+butler push "builds/Flag Rush 150.zip" "JasperTresidder/flag-rush:windows-150fps" --userversion 0.0.4
