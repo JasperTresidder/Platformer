@@ -80,6 +80,8 @@ def load_level(level_number: int):
 class App:
     def __init__(self, screen: pg.Surface, space: pm.Space):
         pg.display.set_caption("Flag Rush")
+        icon = pg.image.load("data\icon\icon.png").convert_alpha()
+        pg.display.set_icon(icon)
         self.screen = screen
         self.space = space
         self.started = False
@@ -158,14 +160,14 @@ class App:
                 self.events[self.game_tick].append([event.type, event.dict])
             if event.type == pg.QUIT:
                 pg.quit()
-                sys.exit(1)
+                sys.exit(0)
             if event.type == pg.KEYDOWN and self.can_start:
                 self.started = True
                 if not self.replay_on:
                     self.player.handle_keydown(event)
                 if event.key == pg.K_ESCAPE:
                     pg.quit()
-                    sys.exit(1)
+                    sys.exit(0)
                 if event.key == pg.K_r:
                     self.next_level(1)
                 if event.key == pg.K_t:
@@ -191,7 +193,6 @@ class App:
         if self.started:
             self.game_tick += 1
         self.curr_fps = self.game_clock.get_fps()
-        pg.display.set_caption(str(self.curr_fps))
         pg.display.flip()
 
     def draw_background(self) -> None:
