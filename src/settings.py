@@ -1,9 +1,9 @@
+import pygame as pg
+import pymunk as pm
+import numpy as np
+from typing import Tuple, List
 import os
 import sys
-from typing import Tuple, List
-import pymunk as pm
-import pygame as pg
-import numpy as np
 
 #############
 DEBUG = False
@@ -12,7 +12,7 @@ DEBUG = False
 AI = False
 WALL_JUMP = False
 LEVEL = 1
-MAX_LEVEL = 6
+MAX_LEVEL = 9
 
 
 

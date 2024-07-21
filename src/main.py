@@ -14,11 +14,11 @@ from src.end_level_text import Menu
 from src.ai import Ai
 
 BACKGROUNDS = [
-    pg.image.load('data/raw/Background/' + filename).convert()
+    pg.image.load('data/raw/Background/' + filename).convert_alpha()
     for filename in os.listdir('data/raw/Background/') if
     'png' in filename
 ]
-BACKGROUNDS = [pg.transform.scale(image, SCREEN_SIZE) for image in BACKGROUNDS[0:1]]
+BACKGROUNDS = [pg.transform.scale(image, SCREEN_SIZE) for image in BACKGROUNDS]
 BACKGROUND = pg.Surface(SCREEN_SIZE)
 for image in BACKGROUNDS:
     BACKGROUND.blit(image, (0, 0), image.get_rect())
@@ -317,6 +317,8 @@ class App:
             self.player.wall_jump = False
         if self.replay_on:
             self.ai = Ai(self.player, self.level)
+        if DEBUG:
+            print(self.level)
 
     def next_level_screen(self):
         if not self.replay_on:
