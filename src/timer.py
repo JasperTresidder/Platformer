@@ -8,31 +8,35 @@ class Timer(pg.sprite.Sprite):
     def __init__(self, screen: pg.Surface):
         super().__init__()
         self.screen = screen
-        self.font = pg.font.get_fonts()
-        #self.font = pg.font.SysFont("ariel", 30)
         self.font = pg.font.Font('data/fonts/Grand9K Pixel.ttf', 30)
-        self.text0 = self.font.render('Esc - Exit', True, (255, 255, 255))
-        self.text0_dest = SCREEN_SIZE[0] - self.text0.get_width() - 40, 40 + self.text0.get_height()
-        self.text1 = self.font.render('R - Retry', True, (255, 255, 255))
-        self.text1_dest = SCREEN_SIZE[0] - self.text1.get_width() - 40, 40 + 2 * self.text1.get_height()
-        self.start_time = time.time_ns()
-        self.end_time = None
+        self.text0 = self.font.render('Esc - Exit', True, (111, 111, 111))
+        self.text0.set_alpha(127)
+        self.text0_dest = SCREEN_SIZE[0] - self.text0.get_width() - 40, 40 + 2 * self.text0.get_height()
+        self.text1 = self.font.render('R - Retry', True, (111, 111, 111))
+        self.text1.set_alpha(127)
+        self.text1_dest = SCREEN_SIZE[0] - self.text1.get_width() - 40, 40 + 3 * self.text1.get_height()
+        self.text2 = self.font.render('T - Toggle Replay', True, (111, 111, 111))
+        self.text2.set_alpha(127)
+        self.text2_dest = SCREEN_SIZE[0] - self.text2.get_width() - 40, 40 + self.text1.get_height()
+        self.ai_text = self.font.render('RECORD REPLAY', True, (0, 200, 0))
+        self.ai_dest = SCREEN_SIZE[0]/2 - self.text1.get_width()/2 - 40, 40
 
 
 
-    def draw(self):
-        self.end_time = time.time_ns()
-        time_centi_seconds = str(round((self.end_time - self.start_time) / math.pow(10,9), 1)).ljust(3, '0')
-        text = self.font.render(time_centi_seconds, True, (200, 0, 0))
+
+    def draw(self, frames, ai):
+        assert type(frames) == int
+        assert type(ai) == bool
+        if frames < 0:
+            frames = 0
+        time_frames = str(round(frames/100, 1)).ljust(3, '0')
+        text = self.font.render(time_frames, True, (200, 0, 0))
         self.screen.blit(text,
                         (SCREEN_SIZE[0] - text.get_width() - 40, 40))
         self.screen.blit(self.text0, self.text0_dest)
         self.screen.blit(self.text1, self.text1_dest)
+        self.screen.blit(self.text2, self.text2_dest)
+        if ai:
+            self.screen.blit(self.ai_text, self.ai_dest)
 
-
-
-    def get_ms_time(self) -> str:
-        return str(round((self.end_time - self.start_time) / math.pow(10,9), 3)).ljust(6, '0')
-    def reset(self):
-        self.start_time = time.time_ns()
 

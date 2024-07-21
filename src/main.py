@@ -1,4 +1,5 @@
 import os
+import pickle
 import sys
 from pymunk.pygame_util import DrawOptions
 from src.character import Character
@@ -10,13 +11,14 @@ from src.flag import Flag
 from src.item import Item
 from src.timer import Timer
 from src.end_level_text import Menu
+from src.ai import Ai
 
 BACKGROUNDS = [
-    pg.image.load('data/raw/Background/' + filename).convert()
+    pg.image.load('data/raw/Background/' + filename).convert_alpha()
     for filename in os.listdir('data/raw/Background/') if
     'png' in filename
 ]
-BACKGROUNDS = [pg.transform.scale(image, SCREEN_SIZE) for image in BACKGROUNDS[0:1]]
+BACKGROUNDS = [pg.transform.scale(image, SCREEN_SIZE) for image in BACKGROUNDS]
 BACKGROUND = pg.Surface(SCREEN_SIZE)
 for image in BACKGROUNDS:
     BACKGROUND.blit(image, (0, 0), image.get_rect())
@@ -77,8 +79,11 @@ def load_level(level_number: int):
 
 class App:
     def __init__(self, screen: pg.Surface, space: pm.Space):
+        pg.display.set_caption("Flag Rush")
         self.screen = screen
         self.space = space
+        self.started = False
+        self.can_start = False
         self.curr_fps = FRAMERATE
         self.space.gravity = 0, 1800  # * 1080/SCREEN_SIZE[1]
         self.game_clock = pg.time.Clock()
@@ -86,9 +91,18 @@ class App:
         self.player = Character(self.space, self.screen, WALL_JUMP)
         self.level = LEVEL
         self.menu = Menu(self.screen)
+        self.replay_on = AI
+
         # screen_dim = (150, 85)
-        self.game_tick = 0
+        self.game_tick = 1
+        if self.replay_on:
+            self.game_tick = -120
+            self.can_start = True
+            self.started = True
+            self.ai = Ai(self.player, self.level)
+        self.level_end = False
         self.time_hit_flag = 0
+        self.events = [[] for i in range(20000)]
         self.walls, self.push_objects, self.spikes, self.flag, self.flag_location_1, self.flag_location_2, self.item, self.level_image = load_level(
             self.level)
         if self.item is not None:
@@ -111,24 +125,24 @@ class App:
         options = DrawOptions(self.screen)
         self.timer = Timer(self.screen)
         while self.running:
-            self.handle_game_events()
             self.draw_background()
             # Print the state of the simulation
-            self.player.draw(self.game_tick)
+            self.player.draw(self.game_tick, self.started)
             for thing in self.push_objects:
                 thing.draw()
             if self.item is not None:
                 if not self.item.got:
-                    self.item.draw(self.game_tick)
+                    self.item.draw(self.game_tick, self.started)
                     self.player_collide_item()
-            self.flag.draw(self.game_tick)
-            self.timer.draw()
+            self.flag.draw(self.game_tick, self.started)
+            self.timer.draw(self.game_tick, self.replay_on)
             if DEBUG:
                 self.space.debug_draw(options)
             self.player_collide_wall()
             self.player_collide_push_object()
             self.player_collide_flag()
             self.player_collide_spike()
+            self.handle_game_events()
             self.update()
             self.space.step(0.02 * 60 / FRAMERATE)  # Step the simulation one step forward
 
@@ -137,19 +151,34 @@ class App:
         Handle events such as inputs and exit screen
         :return:
         """
+        if self.replay_on:
+            self.ai.handle_events(self.game_tick)
         for event in pg.event.get():
+            if not self.replay_on and not self.level_end:
+                self.events[self.game_tick].append([event.type, event.dict])
             if event.type == pg.QUIT:
                 pg.quit()
                 sys.exit(1)
-            if event.type == pg.KEYDOWN:
-                self.player.handle_keydown(event)
+            if event.type == pg.KEYDOWN and self.can_start:
+                self.started = True
+                if not self.replay_on:
+                    self.player.handle_keydown(event)
                 if event.key == pg.K_ESCAPE:
                     pg.quit()
                     sys.exit(1)
                 if event.key == pg.K_r:
-                    self.reset_level()
-            if event.type == pg.KEYUP:
+                    self.next_level(1)
+                if event.key == pg.K_t:
+                    self.replay_on = not self.replay_on
+                    self.next_level(1)
+                if event.key == 61:
+                    self.next_level(2)
+                if event.key == 45:
+                    self.level -= 1
+                    self.next_level(3)
+            elif event.type == pg.KEYUP and not self.replay_on:
                 self.player.handle_keyup(event)
+
 
     def update(self) -> None:
         """
@@ -159,7 +188,8 @@ class App:
         self.player.update()
         self.curr_fps = self.game_clock.get_fps()
         self.game_clock.tick(FRAMERATE)
-        self.game_tick += 1
+        if self.started:
+            self.game_tick += 1
         self.curr_fps = self.game_clock.get_fps()
         pg.display.set_caption(str(self.curr_fps))
         pg.display.flip()
@@ -170,6 +200,7 @@ class App:
 
     def player_collide_wall(self) -> None:
         player_wall_collisions = []
+        self.can_start = True
         for wall in self.walls:
             if not wall.is_boundary:
                 normal = self.player.poly.shapes_collide(wall.poly).normal
@@ -187,14 +218,14 @@ class App:
 
     def player_collide_flag(self) -> None:
         if self.player.poly.shapes_collide(self.flag.poly).points:
-            if not self.flag.got and self.game_tick - self.time_hit_flag > 30:
+            if not self.flag.got:
                 self.flag.body.position = (
                     self.flag_location_2[0] + self.flag.flag_size[0] / 2,
                     self.flag_location_2[1] + self.flag.flag_size[1] / 2)
                 self.flag.got = True
                 self.time_hit_flag = self.game_tick
-            elif self.game_tick - self.time_hit_flag > 30:
-                self.next_level()
+            else:
+                self.next_level(0)
 
     def player_collide_item(self) -> None:
         if self.player.poly.shapes_collide(self.item.poly).points:
@@ -205,14 +236,20 @@ class App:
     def player_collide_spike(self) -> None:
         for spike in self.spikes:
             if self.player.poly.shapes_collide(spike.poly).points:
-                self.reset_level()
+                self.next_level(1)
+                break
 
 
     def reset_level(self):
         self.player.body.position = SCREEN_SIZE[0] / 50, 4 * SCREEN_SIZE[1] / 10
-        self.timer.reset()
+        self.player.body.velocity = (0, 0)
+        self.game_tick = 1
+        if self.replay_on:
+            self.game_tick = -120
+        self.events = [[] for i in range(20000)]
         for thing in self.push_objects:
             thing.body.position = thing.initial_position
+            thing.body.velocity = (0, 0)
             thing.body.angle = 0
         if self.flag.got:
             self.flag.body.position = (
@@ -224,9 +261,23 @@ class App:
                 self.item.body.position = self.item.initial_position
                 self.item.got = False
                 self.player.wall_jump = False
+        self.started = False
+        self.can_start = False
+        if self.replay_on:
+            self.can_start = True
+            self.started = True
+        else:
+            self.player.right = False
+            self.player.left = False
+        # if pg.key.get_pressed()[pg.K_a] or pg.key.get_pressed()[pg.K_LEFT]:
+        #     self.events[0] = [[pg.KEYDOWN, {'key': pg.K_a}]]
+        # elif pg.key.get_pressed()[pg.K_d] or pg.key.get_pressed()[pg.K_RIGHT]:
+        #     self.events[0] = [[pg.KEYDOWN, {'key': pg.K_d}]]
 
-    def next_level(self):
-        self.next_level_screen()
+    def next_level(self, i):
+        if i != 1 and i != 2 and i != 3:
+            self.next_level_screen()
+        self.level_end = False
         if self.level == MAX_LEVEL:
             self.level = 0
         for thing in self.walls:
@@ -239,8 +290,12 @@ class App:
         self.space.remove(self.player.body, self.player.poly)
         if self.item is not None:
             self.space.remove(self.item.body, self.item.poly)
-
-        self.level += 1
+        if i != 1:
+            self.level += 1
+        if i == 3:
+            self.level -= 1
+        if self.level == 0:
+            self.level = MAX_LEVEL
         self.walls, self.push_objects, self.spikes, self.flag, self.flag_location_1, self.flag_location_2, self.item, self.level_image = load_level(
             self.level)
         self.player = Character(self.space, self.screen, self.player.wall_jump)
@@ -255,14 +310,33 @@ class App:
             thing.add_to_space()
         for thing in self.spikes:
             thing.add_to_space()
-        self.timer.reset()
+        self.reset_level()
+        if self.level > 3:
+            self.player.wall_jump = True
+        else:
+            self.player.wall_jump = False
+        if self.replay_on:
+            self.ai = Ai(self.player, self.level)
+        if DEBUG:
+            print(self.level)
 
     def next_level_screen(self):
-        time = self.timer.get_ms_time()
+        if not self.replay_on:
+            file = open(resource_path('data/saves/' + str(self.level) + '/run_' + str(self.game_tick)), 'wb')
+            pickle.dump(self.events[0:self.game_tick + 20], file)
+            file.close()
+            files = os.listdir(resource_path('data/saves/' + str(self.level)))
+            delete = 1;
+            while len(files) > 10:
+                os.remove('data/saves/' + str(self.level) + '/' + files[-delete])
+                files.pop()
+                delete += 1
+        self.level_end = True
         while not pg.key.get_pressed()[pg.K_RETURN]:
             self.handle_game_events()
-            self.menu.draw(time)
+            self.menu.draw(self.game_tick)
             self.update()
+            self.game_tick -= 1
             if pg.key.get_pressed()[pg.K_r]:
                 self.level -= 1
                 break

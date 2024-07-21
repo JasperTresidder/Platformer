@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "level5.tmx",
+    "activeFile": "level0.tmx",
     "expandedProjectPaths": [
         "."
     ],
@@ -30,39 +30,39 @@
             "scale": 2.1236458333333332,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 254.5151321920832,
-                "y": 243.92014519056264
+                "x": 318.79138666797473,
+                "y": 163.39824397900625
             }
         },
         "level1.tmx": {
             "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 240,
-                "y": 135.75
+                "x": 263.5,
+                "y": 109
             }
         },
         "level2.tmx": {
             "scale": 1.9376041666666666,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 242.82565453470244,
-                "y": 134.1863340680609
+                "x": 252.3735283049298,
+                "y": 135.2185366378152
             }
         },
         "level3.tmx": {
             "scale": 1.9376041666666666,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 240.24514811031662,
-                "y": 134.9604859953766
+                "x": 220.89134992742328,
+                "y": 95.73678834471264
             }
         },
         "level4.tmx": {
             "scale": 1.9376041666666666,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 240.24514811031662,
+                "x": 239.98709746787802,
                 "y": 136.25073920756947
             }
         },
@@ -70,16 +70,32 @@
             "scale": 1.9376041666666666,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 277.40444062147196,
-                "y": 170.829525294339
+                "x": 299.3387452287512,
+                "y": 117.15499166711469
             }
         },
         "level6.tmx": {
             "scale": 1.5,
-            "selectedLayer": 1,
+            "selectedLayer": 0,
             "viewCenter": {
-                "x": 212.66666666666669,
-                "y": 101.33333333333331
+                "x": 272.66666666666663,
+                "y": 98.66666666666666
+            }
+        },
+        "level7.tmx": {
+            "scale": 1.5,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 279.33333333333337,
+                "y": 144.66666666666663
+            }
+        },
+        "level8.tmx": {
+            "scale": 1.8366666666666667,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 303.8112522686025,
+                "y": 135.57168784029037
             }
         },
         "spikes.tsx": {
@@ -103,21 +119,23 @@
         "level2.tmx",
         "level3.tmx",
         "level4.tmx",
-        "level5.tmx"
+        "level5.tmx",
+        "level7.tmx"
     ],
     "project": "project.tiled-project",
     "recentFiles": [
         "jungle tileset2.tsx",
+        "level5.tmx",
+        "level2.tmx",
         "level0.tmx",
         "spikes.tsx",
         "Terrain (16x16).tsx",
         "level1.tmx",
-        "level2.tmx",
-        "level3.tmx",
-        "level4.tmx",
-        "level5.tmx",
+        "level8.tmx",
         "All items.tsx",
-        "jungle tileset.tsx"
+        "level6.tmx",
+        "level7.tmx",
+        "level4.tmx"
     ],
     "tileset.lastUsedFormat": "tsx",
     "tileset.tileSize": {

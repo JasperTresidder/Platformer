@@ -1,17 +1,18 @@
+import pygame as pg
+import pymunk as pm
+import numpy as np
+from typing import Tuple, List
 import os
 import sys
-from typing import Tuple, List
-import pymunk as pm
-import pygame as pg
-import numpy as np
 
 #############
 DEBUG = False
 #############
 
+AI = False
 WALL_JUMP = False
 LEVEL = 1
-MAX_LEVEL = 7
+MAX_LEVEL = 9
 
 
 
@@ -51,7 +52,7 @@ pg.mouse.set_visible(False)
 # Level0_Dynamic = [Obstacle(SCREEN, SPACE, (120, 120), (SCREEN_SIZE[0]/2 -30, SCREEN_SIZE[1] / 1.5))]
 
 CHARACTERS = ['Ninja Frog', 'Mask Dude', 'Pink Man', 'Virtual Guy']
-CHARACTER = CHARACTERS[3]
+CHARACTER = CHARACTERS[2]
 
 Character_Spritesheets = {
     'idle': pg.image.load(resource_path("data/assets/Main Characters/" + CHARACTER + "/Idle (32x32).png")).convert_alpha(),

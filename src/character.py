@@ -26,6 +26,8 @@ class Character(pg.sprite.Sprite):
         self.body.moment = 100000000000000
         self.space.add(self.body, self.poly)  # Add both body and shape to the simulation
         self.left, self.right, self.up, self.down = False, False, False, False
+        self.can_move_left = True
+        self.can_move_right = True
         self.can_jump = False
 
         self.size = (100 * SCREEN_SIZE[0] / 1920, 100 * SCREEN_SIZE[1] / 1080)
@@ -55,11 +57,39 @@ class Character(pg.sprite.Sprite):
             else:
                 self.current_animation = 'jump'
 
+    def handle_keydown_ai(self, event: pg.event.Event):
+        if event['key'] == pg.K_d or event['key'] == pg.K_RIGHT:
+            # Right
+            self.right = True
+            self.previous_animation = self.current_animation
+            self.current_animation = 'run'
+        if event['key'] == pg.K_a or event['key'] == pg.K_LEFT:
+            # Left
+            self.left = True
+            self.previous_animation = self.current_animation
+            self.current_animation = 'run_left'
+        if (event['key'] == pg.K_w or event['key'] == pg.K_SPACE or event['key'] == pg.K_UP) and self.can_jump:
+            # UP
+            self.up = True
+            self.previous_animation = self.current_animation
+            if 'left' in self.previous_animation:
+                self.current_animation = 'jump_left'
+            else:
+                self.current_animation = 'jump'
+
     def handle_keyup(self, event: pg.event.Event):
         if event.key == pg.K_d or event.key == pg.K_RIGHT:
             # Right
             self.right = False
         if event.key == pg.K_a or event.key == pg.K_LEFT:
+            # Left
+            self.left = False
+
+    def handle_keyup_ai(self, event: pg.event.Event):
+        if event['key'] == pg.K_d or event['key'] == pg.K_RIGHT:
+            # Right
+            self.right = False
+        if event['key'] == pg.K_a or event['key'] == pg.K_LEFT:
             # Left
             self.left = False
 
@@ -70,8 +100,7 @@ class Character(pg.sprite.Sprite):
 
         if (0, 1) in collisions:  # Touching ground
             self.can_jump = True
-            if not pg.key.get_pressed()[pg.K_d] and not pg.key.get_pressed()[pg.K_a] \
-                    and not pg.key.get_pressed()[pg.K_RIGHT] and not pg.key.get_pressed()[pg.K_LEFT]:
+            if not self.left and not self.right:
                 self.previous_animation = self.current_animation
                 if 'left' in self.previous_animation:
                     self.current_animation = 'idle_left'
@@ -79,7 +108,7 @@ class Character(pg.sprite.Sprite):
                     self.current_animation = 'idle'
 
         if (-1, 0) in collisions:  # Touching Right wall moving Left
-            self.left = False
+            self.can_move_left = False
             if (0, 1) not in collisions and velocity_y > wall_slide_speed:
                 self.previous_animation = self.current_animation
                 self.current_animation = 'wall_jump_left'
@@ -92,23 +121,24 @@ class Character(pg.sprite.Sprite):
                 self.current_animation = 'idle'
             if velocity_y > 80:
                 self.body.velocity = (velocity_x, 80)
-            if not pg.key.get_pressed()[pg.K_a] and not pg.key.get_pressed()[pg.K_LEFT]:
+            if not self.left:
                 self.body.position = [self.body.position.x + 0.1, self.body.position.y]
                 self.current_animation = 'fall'
-        elif pg.key.get_pressed()[pg.K_a] or pg.key.get_pressed()[pg.K_LEFT]:
-            self.left = True
+        elif self.left:
+            self.can_move_left = True
             if (0, 1) not in collisions:
-                self.previous_animation = self.current_animation
-                if velocity_y > 40:
-                    self.current_animation = 'fall_left'
-                else:
-                    self.current_animation = 'jump_left'
+                if 'wall' not in self.current_animation:
+                    self.previous_animation = self.current_animation
+                    if velocity_y > 40:
+                        self.current_animation = 'fall_left'
+                    else:
+                        self.current_animation = 'jump_left'
             else:
                 self.previous_animation = self.current_animation
                 self.current_animation = 'run_left'
 
         if (1, 0) in collisions:  # Touching Left wall moving Right
-            self.right = False
+            self.can_move_right = False
             if (0, 1) not in collisions and velocity_y > wall_slide_speed:
                 self.previous_animation = self.current_animation
                 self.current_animation = 'wall_jump'
@@ -121,17 +151,18 @@ class Character(pg.sprite.Sprite):
                 self.current_animation = 'idle'
             if velocity_y > 80:
                 self.body.velocity = (velocity_x, 80)
-            if not pg.key.get_pressed()[pg.K_d] and not pg.key.get_pressed()[pg.K_RIGHT]:
+            if not self.right:
                 self.body.position = [self.body.position.x - 0.1, self.body.position.y]
                 self.current_animation = 'fall'
-        elif pg.key.get_pressed()[pg.K_d] or pg.key.get_pressed()[pg.K_RIGHT]:
-            self.right = True
+        elif self.right:
+            self.can_move_right = True
             if (0, 1) not in collisions:
-                self.previous_animation = self.current_animation
-                if velocity_y > 40:
-                    self.current_animation = 'fall'
-                else:
-                    self.current_animation = 'jump'
+                if 'wall' not in self.current_animation:
+                    self.previous_animation = self.current_animation
+                    if velocity_y > 40:
+                        self.current_animation = 'fall'
+                    else:
+                        self.current_animation = 'jump'
             else:
                 self.previous_animation = self.current_animation
                 self.current_animation = 'run'
@@ -156,30 +187,30 @@ class Character(pg.sprite.Sprite):
         touching = [box for box in push_objects if self.poly.shapes_collide(box.poly).points]
         if (0, 1) in collisions:  # Touching ground
             self.can_jump = True
-            if not pg.key.get_pressed()[pg.K_d] and not pg.key.get_pressed()[pg.K_a]:
+            if not self.left and not self.right:
                 self.previous_animation = self.current_animation
                 if 'left' in self.previous_animation:
                     self.current_animation = 'idle_left'
                 else:
                     self.current_animation = 'idle'
-            elif pg.key.get_pressed()[pg.K_d]:
+            elif self.right:
                 self.previous_animation = self.current_animation
                 self.current_animation = 'run'
-            elif pg.key.get_pressed()[pg.K_a]:
+            elif self.left:
                 self.previous_animation = self.current_animation
                 self.current_animation = 'run_left'
         if (0, -1) in collisions:  # Touching bottom
             self.can_jump = True
-            if not pg.key.get_pressed()[pg.K_d] and not pg.key.get_pressed()[pg.K_a]:
+            if not self.left and not self.right:
                 self.previous_animation = self.current_animation
                 if 'left' in self.previous_animation:
                     self.current_animation = 'idle_left'
                 else:
                     self.current_animation = 'idle'
-            elif pg.key.get_pressed()[pg.K_d]:
+            elif self.right:
                 self.previous_animation = self.current_animation
                 self.current_animation = 'run'
-            elif pg.key.get_pressed()[pg.K_a]:
+            elif self.left:
                 self.previous_animation = self.current_animation
                 self.current_animation = 'run_left'
 
@@ -221,10 +252,9 @@ class Character(pg.sprite.Sprite):
                     self.current_animation = 'jump'
 
     def update(self):
-        self.body.angle = 0
-        if self.right:
+        if self.right and self.can_move_right:
             self.body.position += (PLAYER_SPEED*SCREEN_SIZE[0]/1920 + self.screen_adjust/230, 0)
-        if self.left:
+        if self.left and self.can_move_left:
             self.body.position += (-PLAYER_SPEED*SCREEN_SIZE[0]/1920 - self.screen_adjust/230, 0)
         if not self.left and not self.right:
             self.body.velocity = (0, self.body.velocity.y)
@@ -232,10 +262,12 @@ class Character(pg.sprite.Sprite):
             self.body.velocity += (0, -870*SCREEN_SIZE[1]/1080 - self.screen_adjust)
             self.up = False
             self.can_jump = False
+        self.body.angle = 0
 
-    def draw(self, clock):
+    def draw(self, clock, started):
         if clock % int(3 * FRAMERATE / 60) == 0:
-            self.frame += 1
+            if started:
+                self.frame += 1
         if self.frame >= len(self.animations[self.current_animation]):
             self.frame = 0
         self.screen.blit(self.animations[self.current_animation][self.frame], (
