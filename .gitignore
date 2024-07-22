@@ -1,3 +1,5 @@
 /builds/
 /data/saves/*/run*
-.vscode/
+/.vscode/
+/.idea/
+Platformer.code-workspace

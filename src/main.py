@@ -344,7 +344,7 @@ class App:
             self.menu.draw(self.game_tick)
             self.update()
             self.game_tick -= 1
-            if pg.key.get_pressed()[pg.K_r]:
+            if pg.key.get_pressed()[pg.K_r] or pg.key.get_pressed()[pg.K_t]:
                 self.level -= 1
                 break
 
