@@ -30,48 +30,48 @@
             "scale": 2.1236458333333332,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 318.79138666797473,
-                "y": 163.39824397900625
+                "x": 356.22700740668074,
+                "y": 195.88953745033604
             }
         },
         "level1.tmx": {
             "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 263.5,
-                "y": 109
+                "x": 223.25,
+                "y": 179.5
             }
         },
         "level2.tmx": {
             "scale": 1.9376041666666666,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 252.3735283049298,
-                "y": 135.2185366378152
+                "x": 223.7299069942476,
+                "y": 180.635449707005
             }
         },
         "level3.tmx": {
             "scale": 1.9376041666666666,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 220.89134992742328,
-                "y": 95.73678834471264
+                "x": 223.7299069942476,
+                "y": 109.6715230363959
             }
         },
         "level4.tmx": {
             "scale": 1.9376041666666666,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 239.98709746787802,
-                "y": 136.25073920756947
+                "x": 280.5010483307349,
+                "y": 171.0875759367776
             }
         },
         "level5.tmx": {
             "scale": 1.9376041666666666,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 299.3387452287512,
-                "y": 117.15499166711469
+                "x": 280.5010483307349,
+                "y": 171.8617278640933
             }
         },
         "level6.tmx": {
@@ -86,8 +86,8 @@
             "scale": 1.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 279.33333333333337,
-                "y": 144.66666666666663
+                "x": 292.99999999999994,
+                "y": 182
             }
         },
         "level8.tmx": {
@@ -125,17 +125,17 @@
     "project": "project.tiled-project",
     "recentFiles": [
         "jungle tileset2.tsx",
-        "level5.tmx",
-        "level2.tmx",
-        "level0.tmx",
-        "spikes.tsx",
-        "Terrain (16x16).tsx",
-        "level1.tmx",
-        "level8.tmx",
-        "All items.tsx",
-        "level6.tmx",
         "level7.tmx",
-        "level4.tmx"
+        "level5.tmx",
+        "level4.tmx",
+        "level3.tmx",
+        "level2.tmx",
+        "level1.tmx",
+        "Terrain (16x16).tsx",
+        "spikes.tsx",
+        "level0.tmx",
+        "level8.tmx",
+        "All items.tsx"
     ],
     "tileset.lastUsedFormat": "tsx",
     "tileset.tileSize": {

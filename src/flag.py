@@ -4,7 +4,7 @@ import pymunk as pm
 
 
 class Flag(pg.sprite.Sprite):
-    def __init__(self, screen: pg.Surface, space, size, location):
+    def __init__(self, screen: pg.Surface, space: pm.Space, size: tuple, location: tuple):
         super().__init__()
         self.space = space
         self.screen = screen
@@ -27,7 +27,7 @@ class Flag(pg.sprite.Sprite):
     def add_to_space(self):
         self.space.add(self.body, self.poly)  # Add both body and shape to the simulation
 
-    def draw(self, clock, started):
+    def draw(self, clock, started: bool):
         if clock % int(3 * FRAMERATE / 60) == 0:
             if started:
                 self.frame += 1

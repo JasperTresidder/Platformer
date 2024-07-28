@@ -144,13 +144,10 @@ class App:
             self.timer.draw(self.game_tick, self.replay_on)
             if DEBUG:
                 self.space.debug_draw(options)
-            self.player_collide_wall()
-            self.player_collide_push_object()
-            self.player_collide_flag()
-            self.player_collide_spike()
+            self.handle_colisions()
             self.handle_game_events()
             self.update()
-            self.space.step(0.02 * 60 / FRAMERATE)  # Step the simulation one step forward
+            self.space.step(0.02 * 60 / FRAMERATE) 
 
     def handle_game_events(self) -> None:
         """
@@ -185,7 +182,6 @@ class App:
             elif event.type == pg.KEYUP and not self.replay_on:
                 self.player.handle_keyup(event)
 
-
     def update(self) -> None:
         """
         Flip the screen and tick the clock
@@ -202,6 +198,12 @@ class App:
     def draw_background(self) -> None:
         self.screen.blit(BACKGROUND, (0, 0), BACKGROUND.get_rect())
         self.screen.blit(self.level_image, (0, 0), self.level_image.get_rect())
+
+    def handle_colisions(self):
+        self.player_collide_wall()
+        self.player_collide_push_object()
+        self.player_collide_flag()
+        self.player_collide_spike() # Step the simulation one step forward
 
     def player_collide_wall(self) -> None:
         player_wall_collisions = []
@@ -244,7 +246,6 @@ class App:
                 self.next_level(1)
                 break
 
-
     def reset_level(self):
         self.player.body.position = SCREEN_SIZE[0] / 50, 4 * SCREEN_SIZE[1] / 10
         self.player.body.velocity = (0, 0)
@@ -279,7 +280,7 @@ class App:
         # elif pg.key.get_pressed()[pg.K_d] or pg.key.get_pressed()[pg.K_RIGHT]:
         #     self.events[0] = [[pg.KEYDOWN, {'key': pg.K_d}]]
 
-    def next_level(self, i):
+    def next_level(self, i: int):
         if i != 1 and i != 2 and i != 3:
             self.next_level_screen()
         self.level_end = False

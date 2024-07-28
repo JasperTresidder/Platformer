@@ -1,4 +1,6 @@
 from src.settings import *
+from src.push_obstacle import Obstacle
+from src.wall import Wall
 
 
 class Character(pg.sprite.Sprite):
@@ -93,7 +95,7 @@ class Character(pg.sprite.Sprite):
             # Left
             self.left = False
 
-    def update_animation_wall(self, collisions):
+    def update_animation_wall(self, collisions: list[tuple]):
         wall_slide_speed = 5
         velocity_x = self.body.velocity.x
         velocity_y = self.body.velocity.y
@@ -180,7 +182,7 @@ class Character(pg.sprite.Sprite):
                 else:
                     self.current_animation = 'jump'
 
-    def update_animation_push_object(self, collisions, push_objects, walls):
+    def update_animation_push_object(self, collisions: list[tuple], push_objects: list[Obstacle], walls: list[Wall]):
         speed = 3 * 130 / FRAMERATE
         velocity_x = self.body.velocity.x
         velocity_y = self.body.velocity.y
@@ -264,7 +266,7 @@ class Character(pg.sprite.Sprite):
             self.can_jump = False
         self.body.angle = 0
 
-    def draw(self, clock, started):
+    def draw(self, clock, started: bool):
         if clock % int(3 * FRAMERATE / 60) == 0:
             if started:
                 self.frame += 1
