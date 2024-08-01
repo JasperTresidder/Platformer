@@ -8,25 +8,14 @@ class Item(pg.sprite.Sprite):
         super().__init__()
         self.space = space
         self.screen = screen
-        self.body = pm.Body()  # Create a Body
-        self.body.body_type = pm.Body.KINEMATIC
-        self.body.position = (location[0] + size[0]/2, location[1] + size[1]/2)  # Set the position of the body
-        self.initial_position = self.body.position
         self.flag_size = size
-        self.poly = pm.Poly.create_box(self.body, size)  # Create a box shape and attach to body
-        self.poly.color = pg.Color("blue")
-        self.poly.mass = 0 # Set the mass on the shape
-        self.poly.elasticity = 0
-        self.poly.density = 0
-        self.poly.friction = 0
+        self.location = (location[0] + size[0]/2, location[1] + size[1]/2)  # Set the position of the body
         self.imgs = Item_Animation
         self.size = SCREEN_SIZE[0]/screen_tiles[0], SCREEN_SIZE[1]/screen_tiles[1]
         self.img = [pg.transform.scale(img, self.size) for img in self.imgs]
         self.frame = 0
         self.got = False
-
-    def add_to_space(self):
-        self.space.add(self.body, self.poly)  # Add both body and shape to the simulation
+        self.rect = pg.Rect(location[0] - size[0]/2, location[1] - size[1]/2, *self.size)
 
     def draw(self, clock, started):
         if clock % int(3 * FRAMERATE / 60) == 0:
@@ -34,5 +23,7 @@ class Item(pg.sprite.Sprite):
                 self.frame += 1
         if self.frame >= len(self.imgs):
             self.frame = 0
-        self.body.angle = 0
-        self.screen.blit(self.img[self.frame], (self.body.position.x - self.size[0]/2, self.body.position.y - self.size[1]/2 - self.size[1]/7), self.img[self.frame].get_rect())
+        #self.body.angle = 0
+        self.screen.blit(self.img[self.frame], (self.location[0] - self.size[0]/2, self.location[1] - self.size[1]/2 - self.size[1]/7), self.img[self.frame].get_rect())
+        if DEBUG:
+            pg.draw.rect(self.screen, (255, 0, 0), self.rect)

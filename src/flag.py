@@ -8,24 +8,14 @@ class Flag(pg.sprite.Sprite):
         super().__init__()
         self.space = space
         self.screen = screen
-        self.body = pm.Body()  # Create a Body
-        self.body.position = (location[0] + size[0]/2, location[1] + size[1]/2)  # Set the position of the body
-        self.body.body_type = pm.Body.KINEMATIC
         self.flag_size = size
-        self.poly = pm.Poly.create_box(self.body, size)  # Create a box shape and attach to body
-        self.poly.color = pg.Color("blue")
-        self.poly.mass = 0 # Set the mass on the shape
-        self.poly.elasticity = 0
-        self.poly.density = 0
-        self.poly.friction = 0
         self.imgs = Flag_Animation
         self.size = (size[0]*2, size[1])
         self.img = [pg.transform.scale(img, self.size) for img in self.imgs]
         self.frame = 0
         self.got = False
+        self.rect = pg.Rect(location[0] + size[0]/2 -25, location[1] + size[1]/2 - 40, *size)
 
-    def add_to_space(self):
-        self.space.add(self.body, self.poly)  # Add both body and shape to the simulation
 
     def draw(self, clock, started: bool):
         if clock % int(3 * FRAMERATE / 60) == 0:
@@ -33,5 +23,6 @@ class Flag(pg.sprite.Sprite):
                 self.frame += 1
         if self.frame >= len(self.imgs):
             self.frame = 0
-        self.body.angle = 0
-        self.screen.blit(self.img[self.frame], (self.body.position.x - self.size[0]/2, self.body.position.y - self.size[1]/2), self.img[self.frame].get_rect())
+        self.screen.blit(self.img[self.frame], (self.rect.x - self.size[0]/2 + 25, self.rect.y - self.size[1]/2 + 40), self.img[self.frame].get_rect())
+        if DEBUG:
+            pg.draw.rect(self.screen, (255, 0, 0), self.rect)

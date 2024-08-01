@@ -20,6 +20,7 @@ class Character(pg.sprite.Sprite):
         self.poly = pm.Poly.create_box(self.body,
                                        ((SCREEN_SIZE[0] / screen_tiles[0]) - 16, SCREEN_SIZE[1] / screen_tiles[1] - 5),
                                        5)
+        self.rect = pg.Rect(SCREEN_SIZE[0] / 50, 4 * SCREEN_SIZE[1] / 10, (SCREEN_SIZE[0] / screen_tiles[0]) - 16, SCREEN_SIZE[1] / screen_tiles[1] - 5)
         self.poly.color = pg.Color("pink")
         self.poly.mass = 10  # Set the mass on the shape
         self.poly.elasticity = 0
@@ -31,6 +32,8 @@ class Character(pg.sprite.Sprite):
         self.can_move_left = True
         self.can_move_right = True
         self.can_jump = False
+        self.double_jump = False
+        self.double_jump_left = 1
 
         self.size = (100 * SCREEN_SIZE[0] / 1920, 100 * SCREEN_SIZE[1] / 1080)
         # self.img = pg.image.load('../data/assets/square_normal.PNG').convert_alpha()
@@ -102,6 +105,7 @@ class Character(pg.sprite.Sprite):
 
         if (0, 1) in collisions:  # Touching ground
             self.can_jump = True
+            self.double_jump_left = 1
             if not self.left and not self.right:
                 self.previous_animation = self.current_animation
                 if 'left' in self.previous_animation:
@@ -189,6 +193,7 @@ class Character(pg.sprite.Sprite):
         touching = [box for box in push_objects if self.poly.shapes_collide(box.poly).points]
         if (0, 1) in collisions:  # Touching ground
             self.can_jump = True
+            self.double_jump_left = 1
             if not self.left and not self.right:
                 self.previous_animation = self.current_animation
                 if 'left' in self.previous_animation:
@@ -203,6 +208,7 @@ class Character(pg.sprite.Sprite):
                 self.current_animation = 'run_left'
         if (0, -1) in collisions:  # Touching bottom
             self.can_jump = True
+            self.double_jump_left = 1
             if not self.left and not self.right:
                 self.previous_animation = self.current_animation
                 if 'left' in self.previous_animation:
@@ -263,8 +269,12 @@ class Character(pg.sprite.Sprite):
         if self.up:
             self.body.velocity += (0, -870*SCREEN_SIZE[1]/1080 - self.screen_adjust)
             self.up = False
-            self.can_jump = False
+            if self.double_jump == True and self.double_jump_left > 0:
+                self.double_jump_left -= 1
+            else:
+                self.can_jump = False
         self.body.angle = 0
+        self.rect.center = self.body.position
 
     def draw(self, clock, started: bool):
         if clock % int(3 * FRAMERATE / 60) == 0:
@@ -275,3 +285,5 @@ class Character(pg.sprite.Sprite):
         self.screen.blit(self.animations[self.current_animation][self.frame], (
         self.body.position.x - self.size[0] / 2, self.body.position.y - self.size[1] / 2 - self.size[1] / 8),
                          self.animations[self.current_animation][self.frame].get_rect())
+        if DEBUG:
+            pg.draw.rect(self.screen, (255, 0, 0), self.rect)

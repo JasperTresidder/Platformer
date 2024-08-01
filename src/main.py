@@ -113,7 +113,6 @@ class App:
             self.level)
         if self.item is not None:
             self.item.add_to_space()
-        self.flag.add_to_space()
 
         for wall in self.walls:
             wall.add_to_space()
@@ -131,23 +130,26 @@ class App:
         options = DrawOptions(self.screen)
         self.timer = Timer(self.screen)
         while self.running:
-            self.draw_background()
-            # Print the state of the simulation
-            self.player.draw(self.game_tick, self.started)
-            for thing in self.push_objects:
-                thing.draw()
-            if self.item is not None:
-                if not self.item.got:
-                    self.item.draw(self.game_tick, self.started)
-                    self.player_collide_item()
-            self.flag.draw(self.game_tick, self.started)
-            self.timer.draw(self.game_tick, self.replay_on)
-            if DEBUG:
-                self.space.debug_draw(options)
+            self.draw(options)
             self.handle_colisions()
             self.handle_game_events()
             self.update()
             self.space.step(0.02 * 60 / FRAMERATE) 
+
+    def draw(self, options):
+        self.draw_background()
+            # Print the state of the simulation
+        self.player.draw(self.game_tick, self.started)
+        for thing in self.push_objects:
+            thing.draw()
+        if self.item is not None:
+            if not self.item.got:
+                self.item.draw(self.game_tick, self.started)
+                self.player_collide_item()
+        self.flag.draw(self.game_tick, self.started)
+        self.timer.draw(self.game_tick, self.replay_on)
+        if DEBUG:
+            pass # self.space.debug_draw(options)
 
     def handle_game_events(self) -> None:
         """
@@ -224,19 +226,19 @@ class App:
         self.player.update_animation_push_object(player_box_collisions, self.push_objects, self.walls)
 
     def player_collide_flag(self) -> None:
-        if self.player.poly.shapes_collide(self.flag.poly).points:
+        if pg.sprite.collide_rect(self.player, self.flag):
             if not self.flag.got:
-                self.flag.body.position = (
-                    self.flag_location_2[0] + self.flag.flag_size[0] / 2,
-                    self.flag_location_2[1] + self.flag.flag_size[1] / 2)
+                self.flag.rect.topleft = (
+                    self.flag_location_2[0],
+                    self.flag_location_2[1] + 22)
                 self.flag.got = True
                 self.time_hit_flag = self.game_tick
             else:
                 self.next_level(0)
 
     def player_collide_item(self) -> None:
-        if self.player.poly.shapes_collide(self.item.poly).points:
-            self.item.body.position = (SCREEN_SIZE[0] + 200, 0)
+        if pg.sprite.collide_rect(self.player, self.item):
+            self.item.location = (SCREEN_SIZE[0] + 200, 0)
             self.item.got = True
             self.player.wall_jump = True
 
@@ -292,10 +294,9 @@ class App:
             self.space.remove(thing.body, thing.poly)
         for thing in self.spikes:
             self.space.remove(thing.body, thing.poly)
-        self.space.remove(self.flag.body, self.flag.poly)
         self.space.remove(self.player.body, self.player.poly)
         if self.item is not None:
-            self.space.remove(self.item.body, self.item.poly)
+            pass
         if i != 1:
             self.level += 1
         if i == 3:
@@ -306,9 +307,8 @@ class App:
             self.level)
         self.player = Character(self.space, self.screen, self.player.wall_jump)
         if self.item is not None:
-            self.item.add_to_space()
+            # self.item.add_to_space()
             self.item.got = False
-        self.flag.add_to_space()
 
         for wall in self.walls:
             wall.add_to_space()
@@ -331,6 +331,7 @@ class App:
     def next_level_screen(self):
         if not self.replay_on:
             file = open(resource_path('data/saves/' + str(self.level) + '/run_' + str(self.game_tick)), 'wb')
+            print(file.name)
             pickle.dump(self.events[0:self.game_tick + 20], file)
             file.close()
             files = os.listdir(resource_path('data/saves/' + str(self.level)))
